@@ -18,17 +18,17 @@ import com.one.societyAPI.logger.LogManager;
 @ComponentScan("com.one")
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
 @EnableAsync
-public class DigitalApiApplication {
+public class SocietyApiApplication {
 	private static final String PERFORMANCE = "PERFORMANCE";  // Compliant
 	private static final String ANALYTICSKPI = "ANALYTICSKPI";  // Compliant
 	
 
 	public static void main(String[] args) {
-		LogManager.setDefaultLogger(new DefaultLogger(DigitalApiApplication.class));
+		LogManager.setDefaultLogger(new DefaultLogger(SocietyApiApplication.class));
 		LogManager.setLogger(PERFORMANCE, new DefaultLogger(PERFORMANCE));
 		LogManager.setLogger(ANALYTICSKPI, new DefaultLogger(ANALYTICSKPI));
 		
-		SpringApplication.run(DigitalApiApplication.class, args);
+		SpringApplication.run(SocietyApiApplication.class, args);
 	}
 
 }

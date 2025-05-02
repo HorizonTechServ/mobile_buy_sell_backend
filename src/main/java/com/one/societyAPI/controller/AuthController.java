@@ -42,68 +42,69 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping("/check-user/{userId}")
-    @Operation(summary = "Check if the user exists using user ID", description = "Check if the user exists using user ID")
-    public ResponseEntity<Map<String, String>> checkUserUnique(@PathVariable String userId) {
+    @GetMapping("/check-user/{mobileNumber}")
+    @Operation(summary = "Check if the user exists using Mobile Number", description = "Check if the user exists using Mobile Number")
+    public ResponseEntity<Map<String, String>> checkUserUnique(@PathVariable String mobileNumber) {
 
         String strMethodName="checkUserUnique";
 
-        LOGGER.infoLog(CLASSNAME, strMethodName, "Received request to check user existence: {} "+ userId);
+        LOGGER.infoLog(CLASSNAME, strMethodName, "Received request to check user existence: {} "+ mobileNumber);
 
         Map<String, String> response = new HashMap<>();
-        if (userService.isUserIdUnique(userId)) {
+        if (userService.isUserIdUnique(mobileNumber)) {
             response.put("message", "User ID is available");
-            LOGGER.debugLog(CLASSNAME, strMethodName, "User ID '{}' is available" + userId);
+            LOGGER.debugLog(CLASSNAME, strMethodName, "User ID '{}' is available" + mobileNumber);
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "User ID already exists");
-            LOGGER.warnLog(CLASSNAME, strMethodName, "User ID '{}' already exists" + userId);
+            LOGGER.warnLog(CLASSNAME, strMethodName, "User ID '{}' already exists" + mobileNumber);
             return ResponseEntity.badRequest().body(response);
         }
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Generate a token using the user ID", description = "You can generate a token using userID and Password")
+    @Operation(summary = "Generate a token using the mobile number", description = "Login with mobile number and password to generate JWT token")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
 
-        String strMethodName = "login";
-        LOGGER.infoLog(CLASSNAME, strMethodName, "Received login request for user: {} " + request.getUserId());
+        String method = "login";
+        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: {}" + request.getMobileNumber());
 
-        Optional<User> userOptional = userRepository.findByUserId(request.getUserId());
+        Optional<User> userOptional = userRepository.findByMobileNumber(request.getMobileNumber());
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // Check if user is ACTIVE
-            if (user.getStatus() != UserStatus.ACTIVE) {
-                LOGGER.warnLog(CLASSNAME, strMethodName, "Login denied - User status is not ACTIVE: {} " + user.getStatus());
-                return ResponseEntity.status(403).body(Map.of("error", "Account is " + user.getStatus() + ". Please contact support."));
-            }
-
-            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                String token = jwtUtil.generateToken(user.getUserId());
-                Date expirationDate = jwtUtil.extractExpiration(token);
-                long expiresAtMillis = expirationDate.getTime(); // Convert to milliseconds
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("token", token);
-                response.put("expires_at", expirationDate.toString());
-                response.put("time", expiresAtMillis);
-                response.put("userId", user.getUserId());
-                response.put("email", user.getEmail());
-                response.put("contactNumber", user.getContactNumber());
-                response.put("id", user.getId());
-
-                LOGGER.infoLog(CLASSNAME, strMethodName, "Login successful for user: {} " + request.getUserId());
-
-                return ResponseEntity.ok(response);
-            } else {
-                LOGGER.warnLog(CLASSNAME, strMethodName, "Invalid password attempt for user: {} " + request.getUserId());
-            }
-        } else {
-            LOGGER.warnLog(CLASSNAME, strMethodName, "Login failed - User not found: {} " + request.getUserId());
+        if (userOptional.isEmpty()) {
+            LOGGER.warnLog(CLASSNAME, method, "Login failed - User not found: {}" + request.getMobileNumber());
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid Credentials"));
         }
 
-        return ResponseEntity.status(401).body(Map.of("error", "Invalid Credentials"));
+        User user = userOptional.get();
+
+        // Check user status
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            LOGGER.warnLog(CLASSNAME, method, "Login denied - User status is not ACTIVE: {}" + user.getStatus());
+            return ResponseEntity.status(403).body(Map.of("error", "Account is " + user.getStatus() + ". Please contact support."));
+        }
+
+        // Validate password
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            LOGGER.warnLog(CLASSNAME, method, "Invalid password attempt for user: {}" + request.getMobileNumber());
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid Credentials"));
+        }
+
+        // Generate JWT Token
+        String token = jwtUtil.generateToken(user.getMobileNumber());
+        Date expirationDate = jwtUtil.extractExpiration(token);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("expires_at", expirationDate.toString());
+        response.put("time", expirationDate.getTime());
+        response.put("mobileNumber", user.getMobileNumber());
+        response.put("email", user.getEmail());
+        response.put("name", user.getName());
+        response.put("role", user.getRole().name());  // Add role
+
+        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: {}" + request.getMobileNumber());
+
+        return ResponseEntity.ok(response);
     }
 }

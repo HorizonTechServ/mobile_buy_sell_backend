@@ -47,14 +47,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Skip JWT authentication for permitted endpoints
         if (requestURI.startsWith("/auth") ||
-                requestURI.startsWith("/digital/api/swagger-ui") ||
-                requestURI.startsWith("/digital/api/v3/api-docs") ||
-                requestURI.startsWith("/digital/api/swagger-ui/index.html") ||
-                requestURI.startsWith("/digital/api/auth/check-user/") ||
-                requestURI.startsWith("/digital/api/users/change-password") ||
-                requestURI.equals("/digital/api/error") ||
-                requestURI.equals("/digital/api/auth/login") ||
-                requestURI.equals("/digital/api/users/register")) {
+                requestURI.startsWith("/society/api/swagger-ui") ||
+                requestURI.startsWith("/society/api/v3/api-docs") ||
+                requestURI.startsWith("/society/api/swagger-ui/index.html") ||
+                requestURI.startsWith("/society/api/auth/check-user/") ||
+                requestURI.equals("/society/api/error") ||
+                requestURI.equals("/society/api/auth/login") ||
+                requestURI.equals("/society/api/users/register")) {
             filterChain.doFilter(request, response);
             return;
         }

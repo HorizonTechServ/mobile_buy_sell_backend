@@ -15,7 +15,7 @@
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder
 			class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="com.one.digitalapi.logger.MaskingPatternLayout">
+			<layout class="com.one.societyAPI.logger.MaskingPatternLayout">
 				<maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
 				<maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
 				<pattern>${CONSOLE_LOG_PATTERN}</pattern>

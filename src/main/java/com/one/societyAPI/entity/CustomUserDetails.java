@@ -1,5 +1,6 @@
 package com.one.societyAPI.entity;
 
+import com.one.societyAPI.utils.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,17 +16,10 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
-    public boolean isAdmin() {
-        return user.isAdmin(); // assuming your User entity has isAdmin()
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (user.isAdmin()) {
-            return Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        } else {
-            return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-        }
+        String role = "ROLE_" + user.getRole().name(); // Assumes user.getRole() returns an enum like Role.ADMIN
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     @Override
@@ -35,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUserId();
+        return user.getMobileNumber(); // Or user.getUserId() if that's your unique field
     }
 
     @Override
@@ -55,7 +49,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getStatus() == UserStatus.ACTIVE;
     }
 
     public User getUser() {

@@ -20,24 +20,22 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public boolean isUserIdUnique(String userId) {
-        return userRepository.findByUserId(userId).isEmpty();
+    public boolean isUserIdUnique(String mobileNumber) {
+        return userRepository.findByMobileNumber(mobileNumber).isEmpty();
     }
 
     public User registerUser(User user) {
         // Check if user already exists
 
-        Optional<User> existingUser = userRepository.findByUserId(user.getUserId());
+        Optional<User> existingUser = userRepository.findByMobileNumber(user.getMobileNumber());
 
         if (existingUser.isPresent()) {
-            throw new UserException("User ID already exists!");
+            throw new UserException("User is already exists!");
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email is already taken");
         }
-
-        user.setAdmin(false); // Ensure all users are not admins by default
 
         user.setLastLogin(LocalDateTime.now());
 
@@ -61,11 +59,11 @@ public class UserService {
             existingUser.setEmail(updatedUserData.getEmail());
         }
 
-        if (!existingUser.getContactNumber().equals(updatedUserData.getContactNumber())
-                && userRepository.existsByContactNumber(updatedUserData.getContactNumber())) {
+        if (!existingUser.getMobileNumber().equals(updatedUserData.getMobileNumber())
+                && userRepository.existsByMobileNumber(updatedUserData.getMobileNumber())) {
             throw new UserException("Contact already in use");
         }
-        existingUser.setContactNumber(updatedUserData.getContactNumber());
+        existingUser.setMobileNumber(updatedUserData.getMobileNumber());
 
         if (updatedUserData.getName() != null) {
             existingUser.setName(updatedUserData.getName());

@@ -1,7 +1,7 @@
 server:
-  port: ${ENV_SERVER_PORT:8080}
+  port: ${ENV_SERVER_PORT:9090}
   servlet:
-    context-path: ${ENV_CONTEXT_PATH:/digital/api}
+    context-path: ${ENV_CONTEXT_PATH:/society/api}
 
   error:
     whitelabel:
@@ -29,7 +29,7 @@ spring:
         jdbc.batch_size: 30
     hibernate:
       naming:
-        physical-strategy: com.one.digitalapi.config.CustomCaseNamingStrategy
+        physical-strategy: com.one.societyAPI.config.CustomCaseNamingStrategy
       ddl-auto: update # Use 'create' for first-time setup, 'update' for changes
   jackson:
     serialization:
@@ -40,25 +40,17 @@ spring:
     ansi: 
       enabled: always
   application:
-    name: ${ENV_APP_NAME:digital_api}
+    name: ${ENV_APP_NAME:society_api}
   datasource:
-   # url: ${ENV_DB_URL:jdbc:h2:mem:test;INIT=CREATE SCHEMA IF NOT EXISTS DIGITAL_API_DB;MODE=PostgreSQL;DB_CLOSE_DELAY=FALSE;DATABASE_TO_UPPER=false;CASE_INSENSITIVE_IDENTIFIERS=TRUE}
-   # username: ${ENV_DB_USERNAME:sa}
-   # password: ${ENV_DB_PASSWORD:}
 
+    url: jdbc:mysql://localhost:3306/society
+    username: root
+    password: root
 
-    #url: ${ENV_DB_URL:}
-    #username: ${ENV_DB_USERNAME:}
-    #password: ${ENV_DB_PASSWORD:}
-
-    #url: jdbc:mysql://localhost:3306/digital
-    #username: root
-    #password: root
-
-    url: ${ENV_DB_URL:jdbc:mysql://13.203.86.197:3306/digital}
-    username: ${ENV_DB_USERNAME:digital}
-    password: ${ENV_DB_PASSWORD:password}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    #url: ${ENV_DB_URL:jdbc:mysql://13.203.86.197:3306/society}
+    #username: ${ENV_DB_USERNAME:society}
+    #password: ${ENV_DB_PASSWORD:password}
+    #driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
         database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -82,8 +74,8 @@ cors:
   allowed-origins: "http://localhost:3000"
 
 razorpay:
-  keyId: rzp_test_hDoWPxUvpOeof6
-  keySecret: DI97f0Q3qsGB2Rnzosyh2TcN
+  keyId: ""
+  keySecret: ""
 
 springdoc:
   swagger-ui:
@@ -101,8 +93,6 @@ management:
       exposure:
         include: "*" 
 
-reservation:
-  gst-percentage: 5.0
 
 feign:
   client:
