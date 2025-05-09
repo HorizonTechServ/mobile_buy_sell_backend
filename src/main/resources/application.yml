@@ -73,9 +73,6 @@ spring:
 cors:
   allowed-origins: "http://localhost:3000"
 
-razorpay:
-  keyId: ""
-  keySecret: ""
 
 springdoc:
   swagger-ui:

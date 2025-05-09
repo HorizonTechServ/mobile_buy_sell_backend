@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/society/api/auth/check-user/") ||
                 requestURI.equals("/society/api/error") ||
                 requestURI.equals("/society/api/auth/login") ||
-                requestURI.equals("/society/api/users/register")) {
+                requestURI.equals("/society/api/users/register/superAdmin")) {
             filterChain.doFilter(request, response);
             return;
         }

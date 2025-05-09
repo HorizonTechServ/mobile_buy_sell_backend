@@ -40,7 +40,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole role = UserRole.USER;
+    private UserRole role = UserRole.SUPER_ADMIN;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
