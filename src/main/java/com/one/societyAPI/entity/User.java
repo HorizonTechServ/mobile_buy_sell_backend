@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -58,4 +59,13 @@ public class User {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "society_id")
+    private Society society; // Nullable for super admin
+
+    @OneToOne
+    @JoinColumn(name = "flat_id", unique = true)
+    private Flat flat;
+
 }

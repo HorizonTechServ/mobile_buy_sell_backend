@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +24,7 @@ import java.util.Optional;
 @Tag(name = "Authentication Management (Generate Token)", description = "APIs for generating a token using user ID and password, and verifying if the user exists")
 public class AuthController {
 
-
-    private static final String CLASSNAME="AuthController";
-
+    private static final String CLASSNAME = "AuthController";
     private static final DefaultLogger LOGGER = new DefaultLogger(AuthController.class);
 
     private final UserService userService;
@@ -45,10 +42,8 @@ public class AuthController {
     @GetMapping("/check-user/{mobileNumber}")
     @Operation(summary = "Check if the user exists using Mobile Number", description = "Check if the user exists using Mobile Number")
     public ResponseEntity<Map<String, String>> checkUserUnique(@PathVariable String mobileNumber) {
-
-        String strMethodName="checkUserUnique";
-
-        LOGGER.infoLog(CLASSNAME, strMethodName, "Received request to check user existence: {} "+ mobileNumber);
+        String strMethodName = "checkUserUnique";
+        LOGGER.infoLog(CLASSNAME, strMethodName, "Received request to check user existence: {}" + mobileNumber);
 
         Map<String, String> response = new HashMap<>();
         if (userService.isUserIdUnique(mobileNumber)) {
@@ -57,7 +52,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "User ID already exists");
-            LOGGER.warnLog(CLASSNAME, strMethodName, "User ID '{}' already exists" + mobileNumber);
+            LOGGER.warnLog(CLASSNAME, strMethodName, "User ID '{}' already exists" +mobileNumber);
             return ResponseEntity.badRequest().body(response);
         }
     }
@@ -65,12 +60,10 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Generate a token using the mobile number", description = "Login with mobile number and password to generate JWT token")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
-
         String method = "login";
-        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: {}" + request.getMobileNumber());
+        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: {}" +request.getMobileNumber());
 
         Optional<User> userOptional = userRepository.findByMobileNumber(request.getMobileNumber());
-
         if (userOptional.isEmpty()) {
             LOGGER.warnLog(CLASSNAME, method, "Login failed - User not found: {}" + request.getMobileNumber());
             return ResponseEntity.status(401).body(Map.of("error", "Invalid Credentials"));
@@ -103,7 +96,7 @@ public class AuthController {
         response.put("name", user.getName());
         response.put("role", user.getRole().name());  // Add role
 
-        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: {}" + request.getMobileNumber());
+        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: {}" +request.getMobileNumber());
 
         return ResponseEntity.ok(response);
     }

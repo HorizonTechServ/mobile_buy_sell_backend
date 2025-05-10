@@ -9,9 +9,9 @@ public interface UserService {
 
     UserDTO registerSuperAdmin(User user);
 
-    UserDTO registerAdmin(User user);
+    public UserDTO registerAdmin(User user, Long societyId);
 
-    UserDTO registerUser(User user);
+    public UserDTO registerUser(User user, Long flatId);
 
     UserDTO updateUser(User updatedUserData);
 }
