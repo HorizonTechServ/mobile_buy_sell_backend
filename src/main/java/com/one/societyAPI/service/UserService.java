@@ -3,6 +3,8 @@ package com.one.societyAPI.service;
 import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.entity.User;
 
+import java.util.List;
+
 public interface UserService {
 
     boolean isUserIdUnique(String mobileNumber);
@@ -13,5 +15,7 @@ public interface UserService {
 
     public UserDTO registerUser(User user, Long flatId);
 
-    UserDTO updateUser(User updatedUserData);
+    List<UserDTO> getUsersBySocietyId(Long societyId);
+
+    UserDTO getAdminBySocietyId(Long societyId);
 }

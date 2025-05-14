@@ -36,13 +36,11 @@ public class UserController {
     private static final DefaultLogger LOGGER = new DefaultLogger(UserController.class);
 
     private final UserService userService;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -87,8 +85,7 @@ public class UserController {
     @PostMapping("/register/user")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "Register a User", description = "Creates a new user")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterRequest request,
-                                          Reader reader) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterRequest request) {
         String method = "registerUser";
         LOGGER.infoLog(CLASSNAME, method, "Received request to register user: {}" + request);
 
@@ -111,66 +108,29 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/update")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "Update user profile", description = "Partially updates the user profile")
-    public ResponseEntity<?> updateUserProfile(@RequestBody User updatedFields) {
-        String methodName = "updateUserProfile";
-        LOGGER.infoLog(CLASSNAME, methodName, "Received request to update user: {}" + updatedFields);
 
+    @GetMapping("/by-society/{societyId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Get Users by Society ID", description = "Fetch all users in a specific society")
+    public ResponseEntity<?> getUsersBySociety(@PathVariable Long societyId) {
         try {
-            UserDTO updatedUser = userService.updateUser(updatedFields);
-            LOGGER.infoLog(CLASSNAME, methodName, "User updated successfully: {}" + updatedUser);
-            return ResponseEntity.ok(updatedUser);
+            return ResponseEntity.ok(userService.getUsersBySocietyId(societyId));
+        } catch (Exception e) {
+            return getMapResponseEntity("Error fetching users", e);
+        }
+    }
+
+    @GetMapping("/admin/by-society/{societyId}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Operation(summary = "Get Admin by Society ID", description = "Fetch admin assigned to a specific society")
+    public ResponseEntity<?> getAdminBySociety(@PathVariable Long societyId) {
+        try {
+            return ResponseEntity.ok(userService.getAdminBySocietyId(societyId));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, methodName, "Error updating user: {}" + e.getMessage());
             return getMapResponseEntity(e.getMessage(), e);
         }
     }
 
-    @PutMapping("/delete/{mobileNumber}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "Soft delete user", description = "Marks user status as DELETED based on mobile number")
-    public ResponseEntity<?> deleteUserAccount(@PathVariable String mobileNumber) {
-        String methodName = "deleteUserAccount";
-        LOGGER.infoLog(CLASSNAME, methodName, "Deleting user with mobile: {}" + mobileNumber);
-
-        Optional<User> userOpt = userRepository.findByMobileNumber(mobileNumber);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (user.getStatus() == UserStatus.ACTIVE) {
-                user.setStatus(UserStatus.DELETE);
-                userRepository.save(user);
-                LOGGER.infoLog(CLASSNAME, methodName, "User marked as deleted.");
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "User marked as DELETED.");
-                return ResponseEntity.ok(response);
-            } else {
-                LOGGER.warnLog(CLASSNAME, methodName, "User not active.");
-                return ResponseEntity.badRequest().body(Map.of("error", "User is not ACTIVE."));
-            }
-        } else {
-            LOGGER.warnLog(CLASSNAME, methodName, "User not found.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found."));
-        }
-    }
-
-    @GetMapping("/{mobileNumber}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Get user", description = "Fetch user by mobile number")
-    public ResponseEntity<?> getUserByMobileNumber(@PathVariable String mobileNumber) {
-        String methodName = "getUserByMobileNumber";
-        LOGGER.infoLog(CLASSNAME, methodName, "Fetching user with mobile: {}" + mobileNumber);
-
-        Optional<User> userOpt = userRepository.findByMobileNumber(mobileNumber);
-        if (userOpt.isPresent()) {
-            LOGGER.infoLog(CLASSNAME, methodName, "User found: {}" + userOpt.get());
-            return ResponseEntity.ok(userOpt.get());
-        } else {
-            LOGGER.warnLog(CLASSNAME, methodName, "User not found.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found."));
-        }
-    }
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<Map<String, Object>> handleUserException(UserException ex) {

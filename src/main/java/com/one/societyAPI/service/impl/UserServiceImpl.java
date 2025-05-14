@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -77,39 +78,17 @@ public class UserServiceImpl implements UserService {
         return toDTO(userRepository.save(user));
     }
 
+    @Override
+    public List<UserDTO> getUsersBySocietyId(Long societyId) {
+        List<User> users = userRepository.findByFlat_Society_IdAndRole(societyId, UserRole.USER);
+        return users.stream().map(this::toDTO).toList();    }
+
 
     @Override
-    public UserDTO updateUser(User updatedUserData) {
-        User existingUser = userRepository.findById(updatedUserData.getId())
-                .orElseThrow(() -> new UserException("User not found"));
-
-        if (updatedUserData.getEmail() != null &&
-                !existingUser.getEmail().equals(updatedUserData.getEmail()) &&
-                userRepository.existsByEmail(updatedUserData.getEmail())) {
-            throw new UserException("Email already in use");
-        }
-        if (updatedUserData.getEmail() != null) {
-            existingUser.setEmail(updatedUserData.getEmail());
-        }
-
-        if (updatedUserData.getMobileNumber() != null &&
-                !existingUser.getMobileNumber().equals(updatedUserData.getMobileNumber()) &&
-                userRepository.existsByMobileNumber(updatedUserData.getMobileNumber())) {
-            throw new UserException("Contact already in use");
-        }
-        if (updatedUserData.getMobileNumber() != null) {
-            existingUser.setMobileNumber(updatedUserData.getMobileNumber());
-        }
-
-        if (updatedUserData.getName() != null) {
-            existingUser.setName(updatedUserData.getName());
-        }
-
-        if (updatedUserData.getGender() != null) {
-            existingUser.setGender(updatedUserData.getGender());
-        }
-
-        return toDTO(userRepository.save(existingUser));
+    public UserDTO getAdminBySocietyId(Long societyId) {
+        User admin = userRepository.findBySociety_IdAndRole(societyId, UserRole.ADMIN)
+                .orElseThrow(() -> new UserException("No admin found for this society"));
+        return toDTO(admin);
     }
 
 
