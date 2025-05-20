@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -90,6 +91,42 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException("No admin found for this society"));
         return toDTO(admin);
     }
+
+
+    @Override
+    @Transactional
+    public UserDTO editUser(Long userId, Map<String, Object> updates) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User not found"));
+
+        if (updates.containsKey("name")) {
+            user.setName((String) updates.get("name"));
+        }
+
+        if (updates.containsKey("mobileNumber")) {
+            String newMobile = (String) updates.get("mobileNumber");
+            if (!newMobile.equals(user.getMobileNumber()) &&
+                    userRepository.findByMobileNumber(newMobile).isPresent()) {
+                throw new UserException("Mobile number already in use");
+            }
+            user.setMobileNumber(newMobile);
+        }
+
+        if (updates.containsKey("flatId")) {
+            Long flatId = Long.valueOf(updates.get("flatId").toString());
+            Flat flat = flatRepository.findById(flatId)
+                    .orElseThrow(() -> new UserException("Flat not found"));
+
+            if (flat.getUser() != null && !flat.getUser().getId().equals(user.getId())) {
+                throw new UserException("Flat already assigned to another user");
+            }
+
+            user.setFlat(flat);
+        }
+
+        return toDTO(userRepository.save(user));
+    }
+
 
 
     // ---------- Private Utility Methods ----------

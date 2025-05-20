@@ -6,9 +6,7 @@ import com.one.societyAPI.dto.UserRegisterRequest;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.logger.DefaultLogger;
-import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.service.UserService;
-import com.one.societyAPI.utils.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -122,6 +120,48 @@ public class UserController {
     public ResponseEntity<?> getAdminBySociety(@PathVariable Long societyId) {
         try {
             return ResponseEntity.ok(userService.getAdminBySocietyId(societyId));
+        } catch (UserException e) {
+            return getMapResponseEntity(e.getMessage(), e);
+        }
+    }
+
+    @PutMapping("/edit/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Edit User Details", description = "Update user name, mobile number, or flat number")
+    public ResponseEntity<?> editUserDetails(
+            @PathVariable Long userId,
+            @RequestBody Map<String, Object> updates) {
+        try {
+            UserDTO updatedUser = userService.editUser(userId, updates);
+            return ResponseEntity.ok(updatedUser);
+        } catch (UserException e) {
+            return getMapResponseEntity(e.getMessage(), e);
+        }
+    }
+
+    @PutMapping("superAdmin/edit/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Edit Super Admin  Details", description = "Update Super Admin name and mobile number,")
+    public ResponseEntity<?> editSuperAdminDetails(
+            @PathVariable Long userId,
+            @RequestBody Map<String, Object> updates) {
+        try {
+            UserDTO updatedUser = userService.editUser(userId, updates);
+            return ResponseEntity.ok(updatedUser);
+        } catch (UserException e) {
+            return getMapResponseEntity(e.getMessage(), e);
+        }
+    }
+
+    @PutMapping("admin/edit/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Edit Admin Details", description = "Update Admin name, mobile number")
+    public ResponseEntity<?> editAdminDetails(
+            @PathVariable Long userId,
+            @RequestBody Map<String, Object> updates) {
+        try {
+            UserDTO updatedUser = userService.editUser(userId, updates);
+            return ResponseEntity.ok(updatedUser);
         } catch (UserException e) {
             return getMapResponseEntity(e.getMessage(), e);
         }

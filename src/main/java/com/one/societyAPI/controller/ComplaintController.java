@@ -54,4 +54,19 @@ public class ComplaintController {
     public ResponseEntity<List<ComplaintDTO>> getBySociety(@PathVariable Long societyId) {
         return ResponseEntity.ok(complaintService.getComplaintsBySociety(societyId));
     }
+
+    @GetMapping("/open/{societyId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "List of Open Complaints", description = "Returns all open complaints for a society")
+    public ResponseEntity<List<ComplaintDTO>> getOpenComplaints(@PathVariable Long societyId) {
+        return ResponseEntity.ok(complaintService.getOpenComplaintsBySociety(societyId));
+    }
+
+    @GetMapping("/resolved/{societyId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "List of Resolved Complaints", description = "Returns all resolved complaints for a society")
+    public ResponseEntity<List<ComplaintDTO>> getResolvedComplaints(@PathVariable Long societyId) {
+        return ResponseEntity.ok(complaintService.getResolvedComplaintsBySociety(societyId));
+    }
+
 }

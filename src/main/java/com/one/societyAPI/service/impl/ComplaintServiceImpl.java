@@ -74,6 +74,23 @@ public class ComplaintServiceImpl implements ComplaintService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ComplaintDTO> getOpenComplaintsBySociety(Long societyId) {
+        return complaintRepository.findOpenComplaintsBySocietyId(societyId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ComplaintDTO> getResolvedComplaintsBySociety(Long societyId) {
+        return complaintRepository.findResolvedComplaintsBySocietyId(societyId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
 
     private ComplaintDTO toDTO(Complaint c) {
         User complaintBy = c.getComplaintBy();

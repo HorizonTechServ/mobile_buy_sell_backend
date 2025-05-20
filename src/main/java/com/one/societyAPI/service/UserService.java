@@ -4,6 +4,7 @@ import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
@@ -18,4 +19,7 @@ public interface UserService {
     List<UserDTO> getUsersBySocietyId(Long societyId);
 
     UserDTO getAdminBySocietyId(Long societyId);
+
+    UserDTO editUser(Long userId, Map<String, Object> updates);
+
 }

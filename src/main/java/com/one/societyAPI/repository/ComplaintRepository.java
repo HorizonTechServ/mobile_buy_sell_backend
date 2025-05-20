@@ -21,4 +21,10 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long> {
             "WHERE s.id = :societyId")
     List<Complaint> findBySocietyId(@Param("societyId") Long societyId);
 
+    @Query("SELECT c FROM Complaint c WHERE c.status = 'OPEN' AND c.complaintBy.flat.society.id = :societyId")
+    List<Complaint> findOpenComplaintsBySocietyId(@Param("societyId") Long societyId);
+
+    @Query("SELECT c FROM Complaint c WHERE c.status = 'RESOLVED' AND c.complaintBy.flat.society.id = :societyId")
+    List<Complaint> findResolvedComplaintsBySocietyId(@Param("societyId") Long societyId);
+
 }
