@@ -5,6 +5,8 @@ import com.one.societyAPI.entity.MaintenancePayment;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.utils.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +15,16 @@ public interface MaintenancePaymentRepository extends JpaRepository<MaintenanceP
     List<MaintenancePayment> findByMaintenance(Maintenance maintenance);
     Optional<MaintenancePayment> findByMaintenanceAndUser(Maintenance maintenance, User user);
     List<MaintenancePayment> findByMaintenanceAndStatus(Maintenance maintenance, PaymentStatus status);
+
+    @Query("SELECT p FROM MaintenancePayment p " +
+            "WHERE p.maintenance = :maintenance " +
+            "AND p.status = :status " +
+            "AND (:month IS NULL OR FUNCTION('MONTH', p.maintenance.dueDate) = :month) " +
+            "AND (:year IS NULL OR FUNCTION('YEAR', p.maintenance.dueDate) = :year)")
+    List<MaintenancePayment> findByMaintenanceStatusAndMonthYear(
+            @Param("maintenance") Maintenance maintenance,
+            @Param("status") PaymentStatus status,
+            @Param("month") Integer month,
+            @Param("year") Integer year
+    );
 }

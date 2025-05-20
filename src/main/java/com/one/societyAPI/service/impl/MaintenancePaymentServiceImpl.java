@@ -59,13 +59,16 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
     }
 
     @Override
-    public List<MaintenancePaymentDTO> getPaymentsByStatus(Long maintenanceId, String status) {
+    public List<MaintenancePaymentDTO> getPaymentsByStatus(Long maintenanceId, String status, Integer month, Integer year) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new RuntimeException("Maintenance not found"));
 
         PaymentStatus paymentStatus = PaymentStatus.valueOf(status.toUpperCase());
-        return paymentRepository.findByMaintenanceAndStatus(maintenance, paymentStatus)
-                .stream()
+
+        List<MaintenancePayment> payments = paymentRepository
+                .findByMaintenanceStatusAndMonthYear(maintenance, paymentStatus, month, year);
+
+        return payments.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -76,8 +79,11 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
                 p.getId(),
                 p.getMaintenance().getId(),
                 p.getUser().getId(),
+                p.getUser().getName(),
                 p.getStatus(),
-                p.getPaymentDate()
+                p.getPaymentDate(),
+                p.getMaintenance().getDueDate(),
+                p.getUser().getFlat().getFlatNumber()
         );
     }
 }

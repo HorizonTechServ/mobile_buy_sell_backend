@@ -8,6 +8,9 @@ public record MaintenancePaymentDTO(
         Long id,
         Long maintenanceId,
         Long userId,
+        String userName,
         PaymentStatus status,
-        LocalDate paymentDate
+        LocalDate paymentDate,
+        LocalDate dueDate,
+        String flatNumber
 ) {}

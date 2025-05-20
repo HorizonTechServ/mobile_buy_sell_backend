@@ -21,7 +21,7 @@ public class MaintenancePaymentController {
     }
 
     @GetMapping("/{maintenanceId}")
-    @Operation(summary = "Get Maintenance Payments by maintenanceId", description = "Get Maintenance Payments by maintenanceId")
+    @Operation(summary = "Get All Maintenance Payments by maintenanceId", description = "Get Maintenance Payments by maintenanceId")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
     public List<MaintenancePaymentDTO> getPayments(@PathVariable Long maintenanceId) {
         return paymentService.getPaymentsByMaintenance(maintenanceId);
@@ -38,14 +38,17 @@ public class MaintenancePaymentController {
         return paymentService.updatePaymentStatus(maintenanceId, userId, status);
     }
 
+
     @GetMapping("/{maintenanceId}/status")
-    @Operation(summary = "Get Maintenance By Status (PAID/UNPAID)", description = "Using Maintenance ID and Maintenance Status (PAID/UNPAID) You Can Get Maintenance Details")
+    @Operation(summary = "Get Maintenance By Status (PAID/PENDING)", description = "Filter by Status, Month, and Year")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
     public List<MaintenancePaymentDTO> getPaymentsByStatus(
             @PathVariable Long maintenanceId,
-            @RequestParam String status
+            @RequestParam String status,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
     ) {
-        return paymentService.getPaymentsByStatus(maintenanceId, status);
+        return paymentService.getPaymentsByStatus(maintenanceId, status, month, year);
     }
 
 }
