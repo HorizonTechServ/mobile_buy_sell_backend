@@ -5,6 +5,7 @@ import com.one.societyAPI.entity.Maintenance;
 import com.one.societyAPI.entity.MaintenancePayment;
 import com.one.societyAPI.entity.Society;
 import com.one.societyAPI.entity.User;
+import com.one.societyAPI.exception.MaintenanceException;
 import com.one.societyAPI.repository.MaintenancePaymentRepository;
 import com.one.societyAPI.repository.MaintenanceRepository;
 import com.one.societyAPI.repository.SocietyRepository;
@@ -37,7 +38,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     @Override
     public MaintenanceDTO createMaintenance(MaintenanceDTO maintenanceDTO) {
         Society society = societyRepository.findById(maintenanceDTO.societyId())
-                .orElseThrow(() -> new RuntimeException("Society not found"));
+                .orElseThrow(() -> new MaintenanceException("Society not found with societyId: " + maintenanceDTO.societyId()));
 
         Maintenance maintenance = new Maintenance();
         maintenance.setDescription(maintenanceDTO.description());

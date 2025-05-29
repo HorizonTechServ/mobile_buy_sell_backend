@@ -4,6 +4,8 @@ import com.one.societyAPI.dto.MaintenancePaymentDTO;
 import com.one.societyAPI.entity.Maintenance;
 import com.one.societyAPI.entity.MaintenancePayment;
 import com.one.societyAPI.entity.User;
+import com.one.societyAPI.exception.MaintenancePaymentException;
+import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.repository.MaintenancePaymentRepository;
 import com.one.societyAPI.repository.MaintenanceRepository;
 import com.one.societyAPI.repository.UserRepository;
@@ -31,7 +33,7 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
     @Override
     public List<MaintenancePaymentDTO> getPaymentsByMaintenance(Long maintenanceId) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
-                .orElseThrow(() -> new RuntimeException("Maintenance not found"));
+                .orElseThrow(() -> new MaintenancePaymentException("Maintenance not found with maintenanceId: " + maintenanceId));
 
         return paymentRepository.findByMaintenance(maintenance)
                 .stream()
@@ -42,17 +44,18 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
     @Override
     public MaintenancePaymentDTO updatePaymentStatus(Long maintenanceId, Long userId, String statusStr) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
-                .orElseThrow(() -> new RuntimeException("Maintenance not found"));
+                .orElseThrow(() -> new MaintenancePaymentException("Maintenance not found with maintenanceId: " + maintenanceId));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserException("User not found with UserId: " + userId));
 
         PaymentStatus status = PaymentStatus.valueOf(statusStr.toUpperCase());
 
         MaintenancePayment payment = paymentRepository.findByMaintenanceAndUser(maintenance, user)
-                .orElseThrow(() -> new RuntimeException("Payment record not found"));
+                .orElseThrow(() -> new MaintenancePaymentException("Payment record not found"));
 
         payment.setStatus(status);
+
         payment.setPaymentDate(status == PaymentStatus.PAID ? LocalDate.now() : null);
 
         return toDTO(paymentRepository.save(payment));
@@ -61,7 +64,7 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
     @Override
     public List<MaintenancePaymentDTO> getPaymentsByStatus(Long maintenanceId, String status, Integer month, Integer year) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
-                .orElseThrow(() -> new RuntimeException("Maintenance not found"));
+                .orElseThrow(() -> new MaintenancePaymentException("Maintenance not found with maintenanceId: " + maintenanceId));
 
         PaymentStatus paymentStatus = PaymentStatus.valueOf(status.toUpperCase());
 

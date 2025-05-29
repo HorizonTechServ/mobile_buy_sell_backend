@@ -3,6 +3,8 @@ package com.one.societyAPI.service.impl;
 import com.one.societyAPI.dto.ComplaintDTO;
 import com.one.societyAPI.entity.Complaint;
 import com.one.societyAPI.entity.User;
+import com.one.societyAPI.exception.ComplaintException;
+import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.repository.ComplaintRepository;
 import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.service.ComplaintService;
@@ -28,7 +30,7 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public ComplaintDTO createComplaint(Long userId, String description) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserException("User not found with id : " + userId));
 
         Complaint complaint = new Complaint();
         complaint.setComplaintBy(user);
@@ -41,13 +43,13 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public ComplaintDTO resolveComplaint(Long complaintId, Long resolverId) {
         Complaint complaint = complaintRepository.findById(complaintId)
-                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+                .orElseThrow(() -> new RuntimeException("Complaint not found with complaintId : " + complaintId));
 
         User resolver = userRepository.findById(resolverId)
-                .orElseThrow(() -> new RuntimeException("Resolver not found"));
+                .orElseThrow(() -> new UserException("Resolver not found with resolverId : " + resolverId));
 
         if (resolver.getRole().equals(UserRole.USER)) {
-            throw new RuntimeException("Only Admin or Super Admin can resolve complaints");
+            throw new UserException("Only Admin or Super Admin can resolve complaints");
         }
 
         complaint.setResolvedBy(resolver);
@@ -59,7 +61,10 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     @Override
     public List<ComplaintDTO> getComplaintsByUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User not found with userId : " + userId));
+
         return complaintRepository.findByComplaintBy(user)
                 .stream()
                 .map(this::toDTO)

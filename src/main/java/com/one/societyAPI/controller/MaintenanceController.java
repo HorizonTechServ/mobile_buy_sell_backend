@@ -1,9 +1,12 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.MaintenanceDTO;
+import com.one.societyAPI.response.StandardResponse;
 import com.one.societyAPI.service.MaintenanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,16 +24,24 @@ public class MaintenanceController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Create a maintenance", description = "add new maintenance")
+    @Operation(
+            summary = "Create a maintenance (ADMIN and SUPER ADMIN Can Create Maintenance)",
+            description = "Add new maintenance"
+    )
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    public MaintenanceDTO create(@RequestBody MaintenanceDTO dto) {
-        return maintenanceService.createMaintenance(dto);
+    public ResponseEntity<StandardResponse<MaintenanceDTO>> create(@Valid @RequestBody MaintenanceDTO dto) {
+        MaintenanceDTO created = maintenanceService.createMaintenance(dto);
+        return ResponseEntity.ok(StandardResponse.success("Maintenance created successfully", created));
     }
 
     @GetMapping("/society/{societyId}")
-    @Operation(summary = "Get all maintenance by society", description = "Get all maintenance by society")
+    @Operation(
+            summary = "Get all maintenance by society (ADMIN and SUPER ADMIN Can GET Maintenance)",
+            description = "Get all maintenance by society"
+    )
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
-    public List<MaintenanceDTO> getBySociety(@PathVariable Long societyId) {
-        return maintenanceService.getMaintenanceBySociety(societyId);
+    public ResponseEntity<StandardResponse<List<MaintenanceDTO>>> getBySociety(@PathVariable Long societyId) {
+        List<MaintenanceDTO> list = maintenanceService.getMaintenanceBySociety(societyId);
+        return ResponseEntity.ok(StandardResponse.success("Maintenance records fetched successfully", list));
     }
 }

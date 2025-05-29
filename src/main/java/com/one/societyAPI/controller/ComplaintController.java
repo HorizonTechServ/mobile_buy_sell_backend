@@ -1,6 +1,8 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.ComplaintDTO;
+import com.one.societyAPI.logger.DefaultLogger;
+import com.one.societyAPI.response.StandardResponse;
 import com.one.societyAPI.service.ComplaintService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,8 +14,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/complaints")
-@Tag(name = "Complaint Management", description = "APIs for managing a complaints")
+@Tag(name = "Complaint Management", description = "APIs for managing complaints")
 public class ComplaintController {
+
+    private static final String CLASSNAME = "ComplaintController";
+    private static final DefaultLogger LOGGER = new DefaultLogger(ComplaintController.class);
 
     private final ComplaintService complaintService;
 
@@ -21,52 +26,60 @@ public class ComplaintController {
         this.complaintService = complaintService;
     }
 
+
     @PostMapping("/create")
-    @Operation(summary = "Add a complaint", description = "add new complaint")
+    @Operation(summary = "Add a complaint", description = "Add a new complaint")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
-    public ResponseEntity<ComplaintDTO> createComplaint(
+    public ResponseEntity<StandardResponse<ComplaintDTO>> createComplaint(
             @RequestParam Long userId,
             @RequestParam String description
     ) {
-        return ResponseEntity.ok(complaintService.createComplaint(userId, description));
+        ComplaintDTO complaint = complaintService.createComplaint(userId, description);
+        return ResponseEntity.ok(StandardResponse.success("Complaint created successfully", complaint));
     }
 
+
     @PostMapping("/resolve")
-    @Operation(summary = "Resolve complaint", description = "Super Admin and Admin Can Resolve Complaint")
+    @Operation(summary = "Resolve complaint", description = "Super Admin and Admin can resolve complaints")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    public ResponseEntity<ComplaintDTO> resolveComplaint(
+    public ResponseEntity<StandardResponse<ComplaintDTO>> resolveComplaint(
             @RequestParam Long complaintId,
             @RequestParam Long resolverId
     ) {
-        return ResponseEntity.ok(complaintService.resolveComplaint(complaintId, resolverId));
+        ComplaintDTO resolved = complaintService.resolveComplaint(complaintId, resolverId);
+        return ResponseEntity.ok(StandardResponse.success("Complaint resolved successfully", resolved));
     }
 
+
     @GetMapping("/by-user/{userId}")
+    @Operation(summary = "Get Complaint By User ID", description = "Get complaints by user ID")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
-    @Operation(summary = "Get Complaint By User ID", description = "Get Complaint by User ID ")
-    public ResponseEntity<List<ComplaintDTO>> getByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(complaintService.getComplaintsByUser(userId));
+    public ResponseEntity<StandardResponse<List<ComplaintDTO>>> getByUser(@PathVariable Long userId) {
+        List<ComplaintDTO> complaints = complaintService.getComplaintsByUser(userId);
+        return ResponseEntity.ok(StandardResponse.success("Fetched complaints by user", complaints));
     }
 
     @GetMapping("/by-society/{societyId}")
+    @Operation(summary = "Get Complaint By Society ID", description = "Get complaints by society ID")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
-    @Operation(summary = "Get Complaint By Society ID", description = "Get Complaint by Society ID ")
-    public ResponseEntity<List<ComplaintDTO>> getBySociety(@PathVariable Long societyId) {
-        return ResponseEntity.ok(complaintService.getComplaintsBySociety(societyId));
+    public ResponseEntity<StandardResponse<List<ComplaintDTO>>> getBySociety(@PathVariable Long societyId) {
+        List<ComplaintDTO> complaints = complaintService.getComplaintsBySociety(societyId);
+        return ResponseEntity.ok(StandardResponse.success("Fetched complaints by society", complaints));
     }
 
     @GetMapping("/open/{societyId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "List of Open Complaints", description = "Returns all open complaints for a society")
-    public ResponseEntity<List<ComplaintDTO>> getOpenComplaints(@PathVariable Long societyId) {
-        return ResponseEntity.ok(complaintService.getOpenComplaintsBySociety(societyId));
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<StandardResponse<List<ComplaintDTO>>> getOpenComplaints(@PathVariable Long societyId) {
+        List<ComplaintDTO> openComplaints = complaintService.getOpenComplaintsBySociety(societyId);
+        return ResponseEntity.ok(StandardResponse.success("Fetched open complaints", openComplaints));
     }
 
     @GetMapping("/resolved/{societyId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "List of Resolved Complaints", description = "Returns all resolved complaints for a society")
-    public ResponseEntity<List<ComplaintDTO>> getResolvedComplaints(@PathVariable Long societyId) {
-        return ResponseEntity.ok(complaintService.getResolvedComplaintsBySociety(societyId));
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<StandardResponse<List<ComplaintDTO>>> getResolvedComplaints(@PathVariable Long societyId) {
+        List<ComplaintDTO> resolvedComplaints = complaintService.getResolvedComplaintsBySociety(societyId);
+        return ResponseEntity.ok(StandardResponse.success("Fetched resolved complaints", resolvedComplaints));
     }
-
 }

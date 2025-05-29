@@ -4,6 +4,8 @@ import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.entity.Flat;
 import com.one.societyAPI.entity.Society;
 import com.one.societyAPI.entity.User;
+import com.one.societyAPI.exception.FlatException;
+import com.one.societyAPI.exception.SocietyException;
 import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.repository.FlatRepository;
 import com.one.societyAPI.repository.SocietyRepository;
@@ -53,7 +55,7 @@ public class UserServiceImpl implements UserService {
         validateUser(user);
 
         Society society = societyRepository.findById(societyId)
-                .orElseThrow(() -> new RuntimeException("Society not found"));
+                .orElseThrow(() -> new SocietyException("Society not found with id: " + societyId));
 
         user.setRole(UserRole.ADMIN);
         user.setSociety(society); // Assign society to admin
@@ -67,10 +69,10 @@ public class UserServiceImpl implements UserService {
         validateUser(user);
 
         Flat flat = flatRepository.findById(flatId)
-                .orElseThrow(() -> new RuntimeException("Flat not found"));
+                .orElseThrow(() -> new FlatException("Flat not found with id: " + flatId));
 
         if (flat.getUser() != null) {
-            throw new RuntimeException("Flat already assigned to another user");
+            throw new FlatException("Flat already assigned to another user");
         }
         user.setRole(UserRole.USER);
 
@@ -97,7 +99,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO editUser(Long userId, Map<String, Object> updates) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException("User not found"));
+                .orElseThrow(() -> new UserException("User not found with user id: " + userId));
 
         if (updates.containsKey("name")) {
             user.setName((String) updates.get("name"));
@@ -107,7 +109,7 @@ public class UserServiceImpl implements UserService {
             String newMobile = (String) updates.get("mobileNumber");
             if (!newMobile.equals(user.getMobileNumber()) &&
                     userRepository.findByMobileNumber(newMobile).isPresent()) {
-                throw new UserException("Mobile number already in use");
+                throw new UserException(newMobile + " Mobile number already in use");
             }
             user.setMobileNumber(newMobile);
         }
@@ -115,7 +117,7 @@ public class UserServiceImpl implements UserService {
         if (updates.containsKey("flatId")) {
             Long flatId = Long.valueOf(updates.get("flatId").toString());
             Flat flat = flatRepository.findById(flatId)
-                    .orElseThrow(() -> new UserException("Flat not found"));
+                    .orElseThrow(() -> new UserException("Flat not found with id " + flatId));
 
             if (flat.getUser() != null && !flat.getUser().getId().equals(user.getId())) {
                 throw new UserException("Flat already assigned to another user");
@@ -132,10 +134,10 @@ public class UserServiceImpl implements UserService {
     // ---------- Private Utility Methods ----------
     private void validateUser(User user) {
         if (userRepository.findByMobileNumber(user.getMobileNumber()).isPresent()) {
-            throw new UserException("User with this mobile number already exists!");
+            throw new UserException(user.getMobileNumber() + " User with this mobile number already exists!");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UserException("Email is already taken");
+            throw new UserException(user.getEmail() + " Email is already taken");
         }
     }
 
