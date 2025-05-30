@@ -7,6 +7,7 @@ import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.response.StandardResponse;
 import com.one.societyAPI.service.UserService;
 import com.one.societyAPI.utils.JwtUtil;
+import com.one.societyAPI.utils.UserRole;
 import com.one.societyAPI.utils.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -88,6 +89,11 @@ public class AuthController {
         responseData.put("email", user.getEmail());
         responseData.put("name", user.getName());
         responseData.put("role", user.getRole().name());
+
+        responseData.put("userId", user.getId());
+        if (user.getRole() == UserRole.ADMIN) {
+            responseData.put("societyId", user.getSociety().getId());
+        }
 
         LOGGER.infoLog(CLASSNAME, method, "Login successful for user: {}" + request.getMobileNumber());
         return ResponseEntity.ok(StandardResponse.success("Login successfully", responseData));

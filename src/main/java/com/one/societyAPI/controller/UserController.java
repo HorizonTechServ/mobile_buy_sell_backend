@@ -6,12 +6,15 @@ import com.one.societyAPI.dto.UserRegisterRequest;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.logger.DefaultLogger;
+import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.response.StandardResponse;
+import com.one.societyAPI.service.OtpService;
 import com.one.societyAPI.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -30,6 +34,13 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @Autowired
+    private OtpService otpService;
 
     @Autowired
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
@@ -182,5 +193,52 @@ public class UserController {
             LOGGER.errorLog(CLASSNAME, method, "Failed to update Admin: {}" + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
+    }
+
+    @PostMapping("/change-password/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestParam String email) {
+
+        if (!userRepository.existsByEmail(email)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email not registered."));
+        }
+
+        otpService.sendOtp(email);
+
+        return ResponseEntity.ok(Map.of("message", "OTP sent to registered email"));
+    }
+
+    @PostMapping("/change-password/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+
+        boolean isVerified = otpService.verifyOtp(email, otp);
+
+        if (isVerified) {
+            return ResponseEntity.ok(Map.of("message", "OTP verified successfully."));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    Map.of("error", "Invalid or expired OTP.")
+            );
+        }
+    }
+
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam String email,
+                                            @RequestParam String newPassword) {
+        if (!otpService.isOtpVerified(email)) {
+            return ResponseEntity.badRequest().body(Map.of("error","OTP verification required."));
+        }
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return ResponseEntity.notFound().build();
+
+        User user = userOpt.get();
+
+        String mobileNumber = user.getMobileNumber();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("mobileNumber", mobileNumber,
+                "message", "Password changed successfully."));
     }
 }
