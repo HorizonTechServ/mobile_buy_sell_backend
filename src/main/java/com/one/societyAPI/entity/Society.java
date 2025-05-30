@@ -27,10 +27,11 @@ public class Society {
     private int totalFlats;
 
     @OneToMany(mappedBy = "society", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference // ✅
     private List<Flat> flats = new ArrayList<>();
 
     @OneToMany(mappedBy = "society", cascade = CascadeType.ALL)
+    @JsonManagedReference // ✅
     private List<User> users = new ArrayList<>();
 
     public Long getId() {

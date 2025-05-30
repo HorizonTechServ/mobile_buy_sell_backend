@@ -40,6 +40,7 @@ public class SocietyController {
 
     @GetMapping
     @Operation(summary = "Get all Society", description = "Get all society")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<StandardResponse<List<Society>>> getAllSocieties() {
         String method = "getAllSocieties";
         LOGGER.infoLog(CLASSNAME, method, "Received request to fetch all societies.");
@@ -48,5 +49,31 @@ public class SocietyController {
 
         LOGGER.infoLog(CLASSNAME, method, "Successfully fetched {} societies", societies.size());
         return ResponseEntity.ok(StandardResponse.success("Societies fetched successfully", societies));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get Society by ID", description = "Fetch a society by its ID")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<StandardResponse<Society>> getSocietyById(@PathVariable Long id) {
+        String method = "getSocietyById";
+        LOGGER.infoLog(CLASSNAME, method, "Received request to fetch society with ID: {}", id);
+
+        Society society = societyService.getSocietyById(id);
+        LOGGER.infoLog(CLASSNAME, method, "Successfully fetched society with ID: {}", id);
+
+        return ResponseEntity.ok(StandardResponse.success("Society fetched successfully", society));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Society by ID", description = "Delete a society by its ID")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<StandardResponse<String>> deleteSociety(@PathVariable Long id) {
+        String method = "deleteSociety";
+        LOGGER.infoLog(CLASSNAME, method, "Received request to delete society with ID: {}", id);
+
+        societyService.deleteSociety(id);
+        LOGGER.infoLog(CLASSNAME, method, "Successfully deleted society with ID: {}", id);
+
+        return ResponseEntity.ok(StandardResponse.success("Society deleted successfully", id.toString()));
     }
 }

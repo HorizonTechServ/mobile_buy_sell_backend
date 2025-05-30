@@ -1,6 +1,8 @@
 package com.one.societyAPI.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,10 +18,11 @@ public class Flat {
 
     @ManyToOne
     @JoinColumn(name = "society_id")
-    @JsonBackReference
+    @JsonBackReference // 🔁 Avoid circular reference with Society
     private Society society;
 
     @OneToOne(mappedBy = "flat")
+    @JsonManagedReference // ✅ Forward part of the reference
     private User user;
 
     public Long getId() {

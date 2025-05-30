@@ -1,5 +1,7 @@
 package com.one.societyAPI.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.one.societyAPI.utils.UserRole;
 import com.one.societyAPI.utils.UserStatus;
 import jakarta.persistence.*;
@@ -62,10 +64,12 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "society_id")
+    @JsonBackReference // 🔁 Avoid circular reference with Society
     private Society society; // Nullable for super admin
 
     @OneToOne
     @JoinColumn(name = "flat_id", unique = true)
+    @JsonBackReference // 🔁 This breaks the cycle
     private Flat flat;
 
 }
