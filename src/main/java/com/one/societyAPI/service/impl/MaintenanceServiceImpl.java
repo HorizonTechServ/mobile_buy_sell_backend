@@ -71,13 +71,42 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<MaintenanceDTO> getMaintenanceByStatus(Long societyId, PaymentStatus status) {
+        List<MaintenancePayment> payments = maintenancePaymentRepository.findByUser_Flat_Society_IdAndStatus(societyId, status);
+
+        return payments.stream()
+                .map(MaintenancePayment::getMaintenance)
+                .distinct()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateStatusForMaintenance(Long societyId, Long maintenanceId, PaymentStatus status) {
+        List<MaintenancePayment> payments = maintenancePaymentRepository
+                .findByUser_Flat_Society_IdAndMaintenance_Id(societyId, maintenanceId);
+
+        if (payments.isEmpty()) {
+            throw new MaintenanceException("No payments found for given society and maintenance");
+        }
+
+        for (MaintenancePayment payment : payments) {
+            payment.setStatus(status);
+        }
+        maintenancePaymentRepository.saveAll(payments);
+    }
+
+
+
     private MaintenanceDTO toDTO(Maintenance maintenance) {
         return new MaintenanceDTO(
                 maintenance.getId(),
                 maintenance.getDescription(),
                 maintenance.getAmount(),
                 maintenance.getDueDate(),
-                maintenance.getSociety().getId()
+                maintenance.getSociety().getId(),
+                maintenance.getStatus()
         );
     }
 
@@ -87,7 +116,8 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 maintenance.getDescription(),
                 maintenance.getAmount(),
                 maintenance.getDueDate(),
-                maintenance.getSociety().getId()
+                maintenance.getSociety().getId(),
+                maintenance.getStatus()
         );
     }
 }

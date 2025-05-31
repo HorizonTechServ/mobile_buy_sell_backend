@@ -14,7 +14,7 @@ public interface UserService {
 
     public UserDTO registerAdmin(User user, Long societyId);
 
-    public UserDTO registerUser(User user, Long flatId);
+    public UserDTO registerUser(User user, Long flatId, Long societyId);
 
     List<UserDTO> getUsersBySocietyId(Long societyId);
 

@@ -69,7 +69,7 @@ public class ComplaintController {
 
     @GetMapping("/open/{societyId}")
     @Operation(summary = "List of Open Complaints", description = "Returns all open complaints for a society")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
     public ResponseEntity<StandardResponse<List<ComplaintDTO>>> getOpenComplaints(@PathVariable Long societyId) {
         List<ComplaintDTO> openComplaints = complaintService.getOpenComplaintsBySociety(societyId);
         return ResponseEntity.ok(StandardResponse.success("Fetched open complaints", openComplaints));

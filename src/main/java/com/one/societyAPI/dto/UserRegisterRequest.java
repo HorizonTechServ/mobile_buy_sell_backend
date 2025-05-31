@@ -24,4 +24,5 @@ public class UserRegisterRequest {
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
     private Long flatId;
+    private Long societyId;
 }

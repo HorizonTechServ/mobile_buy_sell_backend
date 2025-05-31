@@ -1,5 +1,7 @@
 package com.one.societyAPI.dto;
 
+import com.one.societyAPI.utils.PaymentStatus;
+
 import java.time.LocalDate;
 
 public record MaintenanceDTO(
@@ -7,5 +9,6 @@ public record MaintenanceDTO(
         String description,
         Double amount,
         LocalDate dueDate,
-        Long societyId
+        Long societyId,
+        PaymentStatus status
 ) {}

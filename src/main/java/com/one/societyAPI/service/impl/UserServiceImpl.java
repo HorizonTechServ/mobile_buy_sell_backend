@@ -64,12 +64,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO registerUser(User user, Long flatId) {
+    public UserDTO registerUser(User user, Long flatId, Long societyId) {
 
         validateUser(user);
 
         Flat flat = flatRepository.findById(flatId)
                 .orElseThrow(() -> new FlatException("Flat not found with id: " + flatId));
+
+        Society society = societyRepository.findById(societyId)
+                .orElseThrow(() -> new SocietyException("Society not found with id: " + societyId));
 
         if (flat.getUser() != null) {
             throw new FlatException("Flat already assigned to another user");
@@ -77,6 +80,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(UserRole.USER);
 
         user.setFlat(flat); // Assign flat to user
+        user.setSociety(society); // Assign society to user
 
         return toDTO(userRepository.save(user));
     }

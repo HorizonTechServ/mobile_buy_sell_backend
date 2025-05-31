@@ -16,6 +16,10 @@ public interface MaintenancePaymentRepository extends JpaRepository<MaintenanceP
     Optional<MaintenancePayment> findByMaintenanceAndUser(Maintenance maintenance, User user);
     List<MaintenancePayment> findByMaintenanceAndStatus(Maintenance maintenance, PaymentStatus status);
 
+    List<MaintenancePayment> findByUser_Flat_Society_IdAndStatus(Long societyId, PaymentStatus status);
+
+    List<MaintenancePayment> findByUser_Flat_Society_IdAndMaintenance_Id(Long societyId, Long maintenanceId);
+
     @Query("SELECT p FROM MaintenancePayment p " +
             "WHERE p.maintenance = :maintenance " +
             "AND p.status = :status " +

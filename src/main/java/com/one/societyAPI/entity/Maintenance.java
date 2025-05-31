@@ -1,5 +1,6 @@
 package com.one.societyAPI.entity;
 
+import com.one.societyAPI.utils.PaymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,11 @@ public class Maintenance {
     @JoinColumn(name = "society_id")
     @NotNull(message = "Society is required")
     private Society society;
+
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status = PaymentStatus.PENDING;
+
 
     // Getters and Setters
 
@@ -71,5 +77,13 @@ public class Maintenance {
 
     public void setSociety(Society society) {
         this.society = society;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
     }
 }

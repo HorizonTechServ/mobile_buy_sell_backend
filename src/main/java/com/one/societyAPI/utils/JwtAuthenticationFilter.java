@@ -2,6 +2,7 @@ package com.one.societyAPI.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.one.societyAPI.entity.CustomUserDetails;
+import com.one.societyAPI.response.StandardResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -109,7 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
 
-    private void handleUnauthorizedError(HttpServletResponse response, HttpServletRequest request, String message) throws IOException {
+   /* private void handleUnauthorizedError(HttpServletResponse response, HttpServletRequest request, String message) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
 
@@ -120,5 +121,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         errorResponse.put("path", request.getRequestURI());
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
+    }*/
+
+    private void handleUnauthorizedError(HttpServletResponse response, HttpServletRequest request, String message) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json");
+
+        StandardResponse<Object> errorResponse = StandardResponse.error(message, null);
+
+        ObjectMapper mapper = new ObjectMapper();
+        response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }
+
 }

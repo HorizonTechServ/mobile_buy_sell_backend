@@ -91,7 +91,7 @@ public class AuthController {
         responseData.put("role", user.getRole().name());
 
         responseData.put("userId", user.getId());
-        if (user.getRole() == UserRole.ADMIN) {
+        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.USER) {
             responseData.put("societyId", user.getSociety().getId());
         }
 

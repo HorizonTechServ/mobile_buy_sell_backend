@@ -107,7 +107,9 @@ public class UserController {
             user.setGender(request.getGender());
             user.setLastLogin(LocalDateTime.now());
 
-            UserDTO savedUser = userService.registerUser(user, request.getFlatId());
+            //UserDTO savedUser = userService.registerUser(user, request.getFlatId());
+            UserDTO savedUser = userService.registerUser(user, request.getFlatId(), request.getSocietyId());
+
             LOGGER.infoLog(CLASSNAME, method, "User registered: {}" + savedUser);
             return ResponseEntity.ok(StandardResponse.success("User registered", savedUser));
         } catch (UserException e) {
