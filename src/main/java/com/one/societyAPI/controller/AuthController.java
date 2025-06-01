@@ -9,7 +9,6 @@ import com.one.societyAPI.service.UserService;
 import com.one.societyAPI.utils.JwtUtil;
 import com.one.societyAPI.utils.UserRole;
 import com.one.societyAPI.utils.UserStatus;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

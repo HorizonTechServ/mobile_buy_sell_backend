@@ -1,6 +1,7 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.AdminRegisterRequest;
+import com.one.societyAPI.dto.ChangePasswordRequest;
 import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.dto.UserRegisterRequest;
 import com.one.societyAPI.entity.User;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -243,4 +245,57 @@ public class UserController {
         return ResponseEntity.ok(Map.of("mobileNumber", mobileNumber,
                 "message", "Password changed successfully."));
     }
+
+
+    @PostMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<StandardResponse<?>> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        String method = "changePassword";
+        LOGGER.infoLog(CLASSNAME, method, "Password change request");
+
+        try {
+            // Get mobile number of currently logged-in user
+            String mobileNumber = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            // Fetch user from database
+            Optional<User> optionalUser = userRepository.findByMobileNumber(mobileNumber);
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(StandardResponse.error("User not found"));
+            }
+
+            User currentUser = optionalUser.get();
+
+            // Check if old password matches
+            if (!passwordEncoder.matches(request.getOldPassword(), currentUser.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body(StandardResponse.error("Old password is incorrect"));
+            }
+
+            // Check if new and confirm password match
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                return ResponseEntity.badRequest()
+                        .body(StandardResponse.error("New password and confirm password do not match"));
+            }
+
+            // Check if new password is same as old password
+            if (passwordEncoder.matches(request.getNewPassword(), currentUser.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body(StandardResponse.error("New password must be different from the old password"));
+            }
+
+            // Set and encode new password
+            currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(currentUser);
+
+            return ResponseEntity.ok(StandardResponse.success("Password changed successfully", null));
+
+        } catch (Exception e) {
+            LOGGER.errorLog(CLASSNAME, method, "Password change failed: {}" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(StandardResponse.error("Failed to change password"));
+        }
+    }
+
+
 }
