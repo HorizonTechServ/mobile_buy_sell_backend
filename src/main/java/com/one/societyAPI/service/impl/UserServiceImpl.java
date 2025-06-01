@@ -118,6 +118,15 @@ public class UserServiceImpl implements UserService {
             user.setMobileNumber(newMobile);
         }
 
+        if (updates.containsKey("email")) {
+            String newEmail = (String) updates.get("email");
+            if (!newEmail.equalsIgnoreCase(user.getEmail()) &&
+                    userRepository.findByEmail(newEmail).isPresent()) {
+                throw new UserException(newEmail + " email is already in use");
+            }
+            user.setEmail(newEmail);
+        }
+
         if (updates.containsKey("flatId")) {
             Long flatId = Long.valueOf(updates.get("flatId").toString());
             Flat flat = flatRepository.findById(flatId)

@@ -149,7 +149,7 @@ public class UserController {
     }
 
     @PutMapping("/edit/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "Edit User Details", description = "Update user name, mobile number, or flat number")
     public ResponseEntity<StandardResponse<UserDTO>> editUserDetails(
             @PathVariable Long userId,
