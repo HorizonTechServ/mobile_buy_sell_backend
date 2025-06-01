@@ -199,7 +199,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/change-password/send-otp")
+    @PostMapping("/reset-password/send-otp")
     public ResponseEntity<?> sendOtp(@RequestParam String email) {
 
         if (!userRepository.existsByEmail(email)) {
@@ -211,7 +211,7 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "OTP sent to registered email"));
     }
 
-    @PostMapping("/change-password/verify-otp")
+    @PostMapping("/reset-password/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String otp) {
 
         boolean isVerified = otpService.verifyOtp(email, otp);
@@ -226,8 +226,8 @@ public class UserController {
     }
 
 
-    @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestParam String email,
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String email,
                                             @RequestParam String newPassword) {
         if (!otpService.isOtpVerified(email)) {
             return ResponseEntity.badRequest().body(Map.of("error","OTP verification required."));
