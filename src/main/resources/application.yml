@@ -43,13 +43,13 @@ spring:
     name: ${ENV_APP_NAME:society_api}
   datasource:
 
-    url: jdbc:mysql://13.233.142.6:3306/society
-    username: m00nSocietry
-    password: m00nSocietry
+    #url: jdbc:mysql://13.233.142.6:3306/society
+    #username: m00nSocietry
+    #password: m00nSocietry
 
-    #url: jdbc:mysql://localhost:3306/society
-    #username: root
-    #password: root
+    url: jdbc:mysql://localhost:3306/society
+    username: root
+    password: root
 
     #url: ${ENV_DB_URL:jdbc:mysql://13.203.86.197:3306/society}
     #username: ${ENV_DB_USERNAME:society}

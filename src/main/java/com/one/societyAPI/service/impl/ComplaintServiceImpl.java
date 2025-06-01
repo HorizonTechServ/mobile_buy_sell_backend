@@ -3,7 +3,6 @@ package com.one.societyAPI.service.impl;
 import com.one.societyAPI.dto.ComplaintDTO;
 import com.one.societyAPI.entity.Complaint;
 import com.one.societyAPI.entity.User;
-import com.one.societyAPI.exception.ComplaintException;
 import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.repository.ComplaintRepository;
 import com.one.societyAPI.repository.UserRepository;
