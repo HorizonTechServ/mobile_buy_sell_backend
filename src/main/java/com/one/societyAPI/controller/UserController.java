@@ -207,7 +207,7 @@ public class UserController {
         }
 
         otpService.sendOtp(email);
-
+    
         return ResponseEntity.ok(Map.of("message", "OTP sent to registered email"));
     }
 

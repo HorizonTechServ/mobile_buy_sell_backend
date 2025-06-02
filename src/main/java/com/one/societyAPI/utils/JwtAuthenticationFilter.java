@@ -52,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/society/api/v3/api-docs") ||
                 requestURI.startsWith("/society/api/swagger-ui/index.html") ||
                 requestURI.startsWith("/society/api/auth/check-user/") ||
+                requestURI.startsWith("/society/api/users/reset-password") ||
                 requestURI.equals("/society/api/error") ||
                 requestURI.equals("/society/api/auth/login") ||
                 requestURI.equals("/society/api/users/register/superAdmin")) {

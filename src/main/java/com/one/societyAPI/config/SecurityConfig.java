@@ -49,7 +49,10 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/auth", "/error", "/auth/**", "/users/register/superAdmin"
+                        .requestMatchers("/auth", "/error", "/auth/**", "/users/register/superAdmin",
+                                "/users/reset-password",
+                                "/users/reset-password/verify-otp",
+                                "/users/reset-password/send-otp"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
