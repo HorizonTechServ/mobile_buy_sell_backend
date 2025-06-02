@@ -32,14 +32,15 @@ import java.util.Optional;
 public class UserController {
 
     private static final String CLASSNAME = "UserController";
+
     private static final DefaultLogger LOGGER = new DefaultLogger(UserController.class);
 
     private final UserService userService;
+
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
-
 
     @Autowired
     private OtpService otpService;
@@ -54,14 +55,14 @@ public class UserController {
     @Operation(summary = "Register a Super Admin", description = "Creates a new super admin with email and password")
     public ResponseEntity<StandardResponse<UserDTO>> registerSuperAdmin(@Valid @RequestBody User user) {
         String method = "registerSuperAdmin";
-        LOGGER.infoLog(CLASSNAME, method, "Request to register Super Admin: {}" + user);
+        LOGGER.infoLog(CLASSNAME, method, "Request to register Super Admin: " + user);
 
         try {
             UserDTO savedUser = userService.registerSuperAdmin(user);
-            LOGGER.infoLog(CLASSNAME, method, "Super Admin registered: {}" + savedUser);
+            LOGGER.infoLog(CLASSNAME, method, "Super Admin registered: " + savedUser);
             return ResponseEntity.ok(StandardResponse.success("Super Admin registered", savedUser));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to register Super Admin: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to register Super Admin: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -71,7 +72,7 @@ public class UserController {
     @Operation(summary = "Register an Admin", description = "Creates a new admin")
     public ResponseEntity<StandardResponse<UserDTO>> registerAdmin(@Valid @RequestBody AdminRegisterRequest request) {
         String method = "registerAdmin";
-        LOGGER.infoLog(CLASSNAME, method, "Request to register Admin: {}" + request);
+        LOGGER.infoLog(CLASSNAME, method, "Request to register Admin: " + request);
 
         try {
             User user = new User();
@@ -84,10 +85,10 @@ public class UserController {
             user.setLastLogin(LocalDateTime.now());
 
             UserDTO savedAdmin = userService.registerAdmin(user, request.getSocietyId());
-            LOGGER.infoLog(CLASSNAME, method, "Admin registered: {}" + savedAdmin);
+            LOGGER.infoLog(CLASSNAME, method, "Admin registered: " + savedAdmin);
             return ResponseEntity.ok(StandardResponse.success("Admin registered", savedAdmin));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to register Admin: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to register Admin: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -97,7 +98,7 @@ public class UserController {
     @Operation(summary = "Register a User", description = "Creates a new user")
     public ResponseEntity<StandardResponse<UserDTO>> registerUser(@Valid @RequestBody UserRegisterRequest request) {
         String method = "registerUser";
-        LOGGER.infoLog(CLASSNAME, method, "Request to register User: {}" + request);
+        LOGGER.infoLog(CLASSNAME, method, "Request to register User: " + request);
 
         try {
             User user = new User();
@@ -112,10 +113,10 @@ public class UserController {
             //UserDTO savedUser = userService.registerUser(user, request.getFlatId());
             UserDTO savedUser = userService.registerUser(user, request.getFlatId(), request.getSocietyId());
 
-            LOGGER.infoLog(CLASSNAME, method, "User registered: {}" + savedUser);
+            LOGGER.infoLog(CLASSNAME, method, "User registered: " + savedUser);
             return ResponseEntity.ok(StandardResponse.success("User registered", savedUser));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to register User: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to register User: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -125,11 +126,11 @@ public class UserController {
     @Operation(summary = "Get Users by Society ID", description = "Fetch all users in a specific society")
     public ResponseEntity<StandardResponse<?>> getUsersBySociety(@PathVariable Long societyId) {
         String method = "getUsersBySociety";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching users for societyId: {}", societyId);
+        LOGGER.infoLog(CLASSNAME, method, "Fetching users for societyId: ", societyId);
         try {
             return ResponseEntity.ok(StandardResponse.success("Users fetched", userService.getUsersBySocietyId(societyId)));
         } catch (Exception e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error("Error fetching users"));
         }
     }
@@ -139,11 +140,11 @@ public class UserController {
     @Operation(summary = "Get Admin by Society ID", description = "Fetch admin assigned to a specific society")
     public ResponseEntity<StandardResponse<?>> getAdminBySociety(@PathVariable Long societyId) {
         String method = "getAdminBySociety";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching admin for societyId: {}", societyId);
+        LOGGER.infoLog(CLASSNAME, method, "Fetching admin for societyId: ", societyId);
         try {
             return ResponseEntity.ok(StandardResponse.success("Admin fetched", userService.getAdminBySocietyId(societyId)));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch admin: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch admin: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -153,12 +154,12 @@ public class UserController {
     @Operation(summary = "Delete a User", description = "Allows an Admin or Super Admin to delete a user by ID using soft delete")
     public ResponseEntity<StandardResponse<String>> deleteUser(@PathVariable Long userId) {
         String method = "deleteUser";
-        LOGGER.infoLog(CLASSNAME, method, "Request to soft delete user with ID: {}", userId);
+        LOGGER.infoLog(CLASSNAME, method, "Request to soft delete user with ID: ", userId);
         try {
             userService.softDeleteUserById(userId);
             return ResponseEntity.ok(StandardResponse.success("User deleted successfully", "Deleted userId: " + userId));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to delete user: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to delete user: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -169,11 +170,11 @@ public class UserController {
     @Operation(summary = "Get All Users by Society ID (Role = USER)", description = "Fetch users with role USER for a specific society")
     public ResponseEntity<StandardResponse<?>> getUsersBySocietyAndRoleUser(@PathVariable Long societyId) {
         String method = "getUsersBySocietyAndRoleUser";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching users with role USER for societyId: {}", societyId);
+        LOGGER.infoLog(CLASSNAME, method, "Fetching users with role USER for societyId: ", societyId);
         try {
             return ResponseEntity.ok(StandardResponse.success("Users fetched", userService.getUsersBySocietyIdAndRoleUser(societyId)));
         } catch (Exception e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error("Error fetching users with role USER"));
         }
     }
@@ -187,12 +188,12 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody Map<String, Object> updates) {
         String method = "editUserDetails";
-        LOGGER.infoLog(CLASSNAME, method, "Updating userId {} with: {}", userId);
+        LOGGER.infoLog(CLASSNAME, method, "Updating userId  with: ", userId);
         try {
             UserDTO updatedUser = userService.editUser(userId, updates);
             return ResponseEntity.ok(StandardResponse.success("User updated", updatedUser));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to update user: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to update user: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -204,12 +205,12 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody Map<String, Object> updates) {
         String method = "editSuperAdminDetails";
-        LOGGER.infoLog(CLASSNAME, method, "Updating Super Admin userId {} with: {}", userId);
+        LOGGER.infoLog(CLASSNAME, method, "Updating Super Admin userId  with: ", userId);
         try {
             UserDTO updatedUser = userService.editUser(userId, updates);
             return ResponseEntity.ok(StandardResponse.success("Super Admin updated", updatedUser));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to update Super Admin: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to update Super Admin: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -221,12 +222,12 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody Map<String, Object> updates) {
         String method = "editAdminDetails";
-        LOGGER.infoLog(CLASSNAME, method, "Updating Admin userId {} with: {}" ,  userId);
+        LOGGER.infoLog(CLASSNAME, method, "Updating Admin userId  with: " ,  userId);
         try {
             UserDTO updatedUser = userService.editUser(userId, updates);
             return ResponseEntity.ok(StandardResponse.success("Admin updated", updatedUser));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to update Admin: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to update Admin: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -323,11 +324,9 @@ public class UserController {
             return ResponseEntity.ok(StandardResponse.success("Password changed successfully", null));
 
         } catch (Exception e) {
-            LOGGER.errorLog(CLASSNAME, method, "Password change failed: {}" + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Password change failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(StandardResponse.error("Failed to change password"));
         }
     }
-
-
 }

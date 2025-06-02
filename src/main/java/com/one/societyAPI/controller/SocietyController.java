@@ -30,11 +30,11 @@ public class SocietyController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<StandardResponse<Society>> createSociety(@RequestBody CreateSocietyRequest request) {
         String method = "createSociety";
-        LOGGER.infoLog(CLASSNAME, method, "Received request to create a new society with name: {}" + request.getName());
+        LOGGER.infoLog(CLASSNAME, method, "Received request to create a new society with name: " + request.getName());
 
         Society society = societyService.createSociety(request);
 
-        LOGGER.infoLog(CLASSNAME, method, "Successfully created society with ID: {}", society.getId());
+        LOGGER.infoLog(CLASSNAME, method, "Successfully created society with ID: ", society.getId());
         return ResponseEntity.ok(StandardResponse.success("Society created successfully", society));
     }
 
@@ -47,7 +47,7 @@ public class SocietyController {
 
         List<Society> societies = societyService.getAllSocieties();
 
-        LOGGER.infoLog(CLASSNAME, method, "Successfully fetched {} societies", societies.size());
+        LOGGER.infoLog(CLASSNAME, method, "Successfully fetched " + societies.size() + "societies");
         return ResponseEntity.ok(StandardResponse.success("Societies fetched successfully", societies));
     }
 
@@ -56,10 +56,10 @@ public class SocietyController {
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<StandardResponse<Society>> getSocietyById(@PathVariable Long id) {
         String method = "getSocietyById";
-        LOGGER.infoLog(CLASSNAME, method, "Received request to fetch society with ID: {}", id);
+        LOGGER.infoLog(CLASSNAME, method, "Received request to fetch society with ID: ", id);
 
         Society society = societyService.getSocietyById(id);
-        LOGGER.infoLog(CLASSNAME, method, "Successfully fetched society with ID: {}", id);
+        LOGGER.infoLog(CLASSNAME, method, "Successfully fetched society with ID: ", id);
 
         return ResponseEntity.ok(StandardResponse.success("Society fetched successfully", society));
     }
@@ -69,10 +69,10 @@ public class SocietyController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<StandardResponse<String>> deleteSociety(@PathVariable Long id) {
         String method = "deleteSociety";
-        LOGGER.infoLog(CLASSNAME, method, "Received request to delete society with ID: {}", id);
+        LOGGER.infoLog(CLASSNAME, method, "Received request to delete society with ID: ", id);
 
         societyService.deleteSociety(id);
-        LOGGER.infoLog(CLASSNAME, method, "Successfully deleted society with ID: {}", id);
+        LOGGER.infoLog(CLASSNAME, method, "Successfully deleted society with ID: ", id);
 
         return ResponseEntity.ok(StandardResponse.success("Society deleted successfully", id.toString()));
     }

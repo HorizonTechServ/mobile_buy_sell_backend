@@ -1,6 +1,7 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.MaintenancePaymentDTO;
+import com.one.societyAPI.logger.DefaultLogger;
 import com.one.societyAPI.response.StandardResponse;
 import com.one.societyAPI.service.MaintenancePaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,9 @@ import java.util.List;
 @Tag(name = "Maintenance Payments Management", description = "APIs for managing a Maintenance Payments")
 public class MaintenancePaymentController {
 
+    private static final String CLASSNAME = "MaintenancePaymentController";
+    private static final DefaultLogger LOGGER = new DefaultLogger(MaintenancePaymentController.class);
+
     private final MaintenancePaymentService paymentService;
 
     public MaintenancePaymentController(MaintenancePaymentService paymentService) {
@@ -26,7 +30,12 @@ public class MaintenancePaymentController {
     @Operation(summary = "Get All Maintenance Payments by maintenanceId", description = "Get Maintenance Payments by maintenanceId")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
     public ResponseEntity<StandardResponse<List<MaintenancePaymentDTO>>> getPayments(@PathVariable Long maintenanceId) {
+        String method = "getPayments";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching payments for maintenance ID " + maintenanceId);
+
         List<MaintenancePaymentDTO> result = paymentService.getPaymentsByMaintenance(maintenanceId);
+
+        LOGGER.infoLog(CLASSNAME, method, "Fetched " + result.size() + " payment records", 200L);
         return ResponseEntity.ok(StandardResponse.success("Payments fetched successfully", result));
     }
 
@@ -38,8 +47,17 @@ public class MaintenancePaymentController {
             @RequestParam Long userId,
             @RequestParam String status // "PAID" or "PENDING"
     ) {
-        MaintenancePaymentDTO updated = paymentService.updatePaymentStatus(maintenanceId, userId, status);
-        return ResponseEntity.ok(StandardResponse.success("Payment status updated successfully", updated));
+        String method = "updateStatus";
+        LOGGER.infoLog(CLASSNAME, method, "Updating status to " + status + " for maintenance ID " + maintenanceId + " and user ID " + userId);
+
+        try {
+            MaintenancePaymentDTO updated = paymentService.updatePaymentStatus(maintenanceId, userId, status);
+            LOGGER.infoLog(CLASSNAME, method, "Payment status updated successfully", 200L);
+            return ResponseEntity.ok(StandardResponse.success("Payment status updated successfully", updated));
+        } catch (Exception ex) {
+            LOGGER.infoLog(CLASSNAME, method, "Error while updating payment status", ex);
+            throw ex;
+        }
     }
 
     @GetMapping("/{maintenanceId}/status")
@@ -51,7 +69,15 @@ public class MaintenancePaymentController {
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year
     ) {
+        String method = "getPaymentsByStatus";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching payments for maintenance ID " + maintenanceId +
+                " with status " + status +
+                (month != null ? ", month " + month : "") +
+                (year != null ? ", year " + year : ""));
+
         List<MaintenancePaymentDTO> list = paymentService.getPaymentsByStatus(maintenanceId, status, month, year);
+
+        LOGGER.infoLog(CLASSNAME, method, "Fetched " + list.size() + " filtered payment records", 200L);
         return ResponseEntity.ok(StandardResponse.success("Filtered payments fetched successfully", list));
     }
 }

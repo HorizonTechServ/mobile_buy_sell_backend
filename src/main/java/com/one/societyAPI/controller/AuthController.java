@@ -43,13 +43,13 @@ public class AuthController {
     @GetMapping("/check-user/{mobileNumber}")
     public ResponseEntity<StandardResponse<Void>> checkUserUnique(@PathVariable String mobileNumber) {
         String strMethodName = "checkUserUnique";
-        LOGGER.infoLog(CLASSNAME, strMethodName, "Received request to check user existence: {}" + mobileNumber);
+        LOGGER.infoLog(CLASSNAME, strMethodName, "Received request to check user existence: " + mobileNumber);
 
         if (userService.isUserIdUnique(mobileNumber)) {
-            LOGGER.debugLog(CLASSNAME, strMethodName, "User ID '{}' is available" + mobileNumber);
+            LOGGER.debugLog(CLASSNAME, strMethodName, "User ID is available" + mobileNumber);
             return ResponseEntity.ok(StandardResponse.success("User ID is available", null));
         } else {
-            LOGGER.warnLog(CLASSNAME, strMethodName, "User ID '{}' already exists" + mobileNumber);
+            LOGGER.warnLog(CLASSNAME, strMethodName, "User ID already exists" + mobileNumber);
             return ResponseEntity.badRequest().body(StandardResponse.error("User ID already exists"));
         }
     }
@@ -58,22 +58,22 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<StandardResponse<Map<String, Object>>> login(@Valid @RequestBody LoginRequest request) {
         String method = "login";
-        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: {}" + request.getMobileNumber());
+        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: " + request.getMobileNumber());
 
         Optional<User> userOptional = userRepository.findByMobileNumber(request.getMobileNumber());
         if (userOptional.isEmpty()) {
-            LOGGER.warnLog(CLASSNAME, method, "Login failed - User not found: {}" + request.getMobileNumber());
+            LOGGER.warnLog(CLASSNAME, method, "Login failed - User not found: " + request.getMobileNumber());
             return ResponseEntity.status(401).body(StandardResponse.error("Invalid Credentials"));
         }
 
         User user = userOptional.get();
         if (user.getStatus() != UserStatus.ACTIVE) {
-            LOGGER.warnLog(CLASSNAME, method, "Login denied - User status is not ACTIVE: {}" + user.getStatus());
+            LOGGER.warnLog(CLASSNAME, method, "Login denied - User status is not ACTIVE: " + user.getStatus());
             return ResponseEntity.status(403).body(StandardResponse.error("Account is " + user.getStatus() + ". Please contact support."));
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            LOGGER.warnLog(CLASSNAME, method, "Invalid password attempt for user: {}" + request.getMobileNumber());
+            LOGGER.warnLog(CLASSNAME, method, "Invalid password attempt for user: " + request.getMobileNumber());
             return ResponseEntity.status(401).body(StandardResponse.error("Invalid Credentials"));
         }
 
@@ -94,7 +94,7 @@ public class AuthController {
             responseData.put("societyId", user.getSociety().getId());
         }
 
-        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: {}" + request.getMobileNumber());
+        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: " + request.getMobileNumber());
         return ResponseEntity.ok(StandardResponse.success("Login successfully", responseData));
     }
 
