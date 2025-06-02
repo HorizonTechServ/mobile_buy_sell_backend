@@ -148,6 +148,38 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/delete/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Delete a User", description = "Allows an Admin or Super Admin to delete a user by ID using soft delete")
+    public ResponseEntity<StandardResponse<String>> deleteUser(@PathVariable Long userId) {
+        String method = "deleteUser";
+        LOGGER.infoLog(CLASSNAME, method, "Request to soft delete user with ID: {}", userId);
+        try {
+            userService.softDeleteUserById(userId);
+            return ResponseEntity.ok(StandardResponse.success("User deleted successfully", "Deleted userId: " + userId));
+        } catch (UserException e) {
+            LOGGER.errorLog(CLASSNAME, method, "Failed to delete user: {}" + e.getMessage());
+            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/getAllUser/by-society/{societyId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Get All Users by Society ID (Role = USER)", description = "Fetch users with role USER for a specific society")
+    public ResponseEntity<StandardResponse<?>> getUsersBySocietyAndRoleUser(@PathVariable Long societyId) {
+        String method = "getUsersBySocietyAndRoleUser";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching users with role USER for societyId: {}", societyId);
+        try {
+            return ResponseEntity.ok(StandardResponse.success("Users fetched", userService.getUsersBySocietyIdAndRoleUser(societyId)));
+        } catch (Exception e) {
+            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: {}" + e.getMessage());
+            return ResponseEntity.badRequest().body(StandardResponse.error("Error fetching users with role USER"));
+        }
+    }
+
+
+
     @PutMapping("/edit/{userId}")
     @PreAuthorize("hasAnyRole('USER','ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "Edit User Details", description = "Update user name, mobile number, or flat number")
@@ -207,7 +239,7 @@ public class UserController {
         }
 
         otpService.sendOtp(email);
-    
+
         return ResponseEntity.ok(Map.of("message", "OTP sent to registered email"));
     }
 

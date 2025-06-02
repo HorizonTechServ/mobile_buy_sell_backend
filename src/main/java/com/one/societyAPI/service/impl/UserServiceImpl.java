@@ -12,6 +12,7 @@ import com.one.societyAPI.repository.SocietyRepository;
 import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.service.UserService;
 import com.one.societyAPI.utils.UserRole;
+import com.one.societyAPI.utils.UserStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -97,6 +99,28 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException("No admin found for this society"));
         return toDTO(admin);
     }
+
+    @Override
+    @Transactional
+    public void softDeleteUserById(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User not found with ID: " + userId));
+
+        if (user.getStatus() == UserStatus.DELETE) {
+            throw new UserException("User is already deleted.");
+        }
+
+        user.setStatus(UserStatus.DELETE);
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<UserDTO> getUsersBySocietyIdAndRoleUser(Long societyId) {
+        List<User> users = userRepository.findBySocietyIdAndRole(societyId, UserRole.USER);
+        return users.stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
 
 
     @Override

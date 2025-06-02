@@ -22,4 +22,8 @@ public interface UserService {
 
     UserDTO editUser(Long userId, Map<String, Object> updates);
 
+    void softDeleteUserById(Long userId);
+
+    List<UserDTO> getUsersBySocietyIdAndRoleUser(Long societyId);
+
 }
