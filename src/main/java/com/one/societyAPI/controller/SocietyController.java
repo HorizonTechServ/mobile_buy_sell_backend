@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/societies")
@@ -76,4 +77,13 @@ public class SocietyController {
 
         return ResponseEntity.ok(StandardResponse.success("Society deleted successfully", id.toString()));
     }
+
+    @GetMapping("/flats/{societyId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Get flats by society ID", description = "Returns available and assigned flats for a society")
+    public ResponseEntity<StandardResponse<Map<String, Object>>> getFlatsBySocietyId(@PathVariable Long societyId) {
+        Map<String, Object> flatMap = societyService.getFlatsBySocietyId(societyId);
+        return ResponseEntity.ok(StandardResponse.success("Flats fetched successfully", flatMap));
+    }
+
 }

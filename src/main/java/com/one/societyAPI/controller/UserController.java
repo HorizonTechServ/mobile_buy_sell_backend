@@ -156,6 +156,8 @@ public class UserController {
         String method = "deleteUser";
         LOGGER.infoLog(CLASSNAME, method, "Request to soft delete user with ID: ", userId);
         try {
+
+
             userService.softDeleteUserById(userId);
             return ResponseEntity.ok(StandardResponse.success("User deleted successfully", "Deleted userId: " + userId));
         } catch (UserException e) {

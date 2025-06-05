@@ -112,6 +112,15 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setStatus(UserStatus.DELETE);
+
+        // Unassign flat if assigned
+        Flat assignedFlat = user.getFlat();
+        if (assignedFlat != null) {
+            user.setFlat(null);        // Remove flat from user
+            assignedFlat.setUser(null); // Optional: remove user from flat if bi-directional
+            flatRepository.save(assignedFlat);
+        }
+
         userRepository.save(user);
     }
 

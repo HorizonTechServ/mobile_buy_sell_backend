@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,4 +70,19 @@ public class SocietyServiceImpl implements SocietyService {
         Society society = getSocietyById(id);
         societyRepository.delete(society);
     }
+
+    public Map<String, Object> getFlatsBySocietyId(Long societyId) {
+        List<Flat> available = flatRepository.findBySocietyIdAndUserIsNull(societyId);
+        List<Flat> assigned = flatRepository.findBySocietyIdAndUserIsNotNull(societyId);
+
+        int total = available.size() + assigned.size();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalFlats", total);
+        result.put("availableFlats", available);
+        result.put("assignedFlats", assigned);
+
+        return result;
+    }
+
 }
