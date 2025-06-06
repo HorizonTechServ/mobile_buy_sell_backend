@@ -31,4 +31,6 @@ public interface MaintenancePaymentRepository extends JpaRepository<MaintenanceP
             @Param("month") Integer month,
             @Param("year") Integer year
     );
+
+    List<MaintenancePayment> findByUser(User user);
 }

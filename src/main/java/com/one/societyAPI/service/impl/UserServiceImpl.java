@@ -2,15 +2,18 @@ package com.one.societyAPI.service.impl;
 
 import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.entity.Flat;
+import com.one.societyAPI.entity.MaintenancePayment;
 import com.one.societyAPI.entity.Society;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.exception.FlatException;
 import com.one.societyAPI.exception.SocietyException;
 import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.repository.FlatRepository;
+import com.one.societyAPI.repository.MaintenancePaymentRepository;
 import com.one.societyAPI.repository.SocietyRepository;
 import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.service.UserService;
+import com.one.societyAPI.utils.PaymentStatus;
 import com.one.societyAPI.utils.UserRole;
 import com.one.societyAPI.utils.UserStatus;
 import jakarta.transaction.Transactional;
@@ -28,14 +31,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final SocietyRepository societyRepository;
     private final FlatRepository flatRepository;
+    private final MaintenancePaymentRepository paymentRepository;
+
 
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, SocietyRepository societyRepository, FlatRepository flatRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, SocietyRepository societyRepository, FlatRepository flatRepository, MaintenancePaymentRepository paymentRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.societyRepository = societyRepository;
         this.flatRepository = flatRepository;
+        this.paymentRepository = paymentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -94,11 +100,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDTO getAdminBySocietyId(Long societyId) {
-        User admin = userRepository.findBySociety_IdAndRole(societyId, UserRole.ADMIN)
-                .orElseThrow(() -> new UserException("No admin found for this society"));
-        return toDTO(admin);
+    public List<UserDTO> getAdminsBySocietyId(Long societyId) {
+        List<User> admins = userRepository.findBySociety_IdAndRole(societyId, UserRole.ADMIN);
+
+        if (admins.isEmpty()) {
+            throw new UserException("No admin found for this society");
+        }
+
+        return admins.stream().map(this::toDTO).collect(Collectors.toList());
     }
+
 
     @Override
     @Transactional
@@ -195,6 +206,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDTO toDTO(User user) {
+        // Fetch payments for this user
+        List<MaintenancePayment> payments = paymentRepository.findByUser(user);
+
+        // Determine maintenance status
+        boolean hasPending = payments.stream()
+                .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING);
+
+        String maintenanceStatus = hasPending ? "PENDING" : "PAID";
+
         return new UserDTO(
                 user.getId(),
                 user.getName(),
@@ -204,7 +224,8 @@ public class UserServiceImpl implements UserService {
                 user.getRole(),
                 user.getStatus(),
                 user.getLastLogin(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                maintenanceStatus // <- add this here
         );
     }
 }

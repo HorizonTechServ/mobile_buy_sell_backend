@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -135,16 +136,18 @@ public class UserController {
         }
     }
 
+
     @GetMapping("/admin/by-society/{societyId}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    @Operation(summary = "Get Admin by Society ID", description = "Fetch admin assigned to a specific society")
-    public ResponseEntity<StandardResponse<?>> getAdminBySociety(@PathVariable Long societyId) {
-        String method = "getAdminBySociety";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching admin for societyId: ", societyId);
+    @Operation(summary = "Get Admins by Society ID", description = "Fetch all admins assigned to a specific society")
+    public ResponseEntity<StandardResponse<?>> getAdminsBySociety(@PathVariable Long societyId) {
+        String method = "getAdminsBySociety";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching admins for societyId: ", societyId);
         try {
-            return ResponseEntity.ok(StandardResponse.success("Admin fetched", userService.getAdminBySocietyId(societyId)));
+            List<UserDTO> admins = userService.getAdminsBySocietyId(societyId);
+            return ResponseEntity.ok(StandardResponse.success("Admins fetched", admins));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch admin: " + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch admins: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
@@ -156,8 +159,6 @@ public class UserController {
         String method = "deleteUser";
         LOGGER.infoLog(CLASSNAME, method, "Request to soft delete user with ID: ", userId);
         try {
-
-
             userService.softDeleteUserById(userId);
             return ResponseEntity.ok(StandardResponse.success("User deleted successfully", "Deleted userId: " + userId));
         } catch (UserException e) {
@@ -180,7 +181,6 @@ public class UserController {
             return ResponseEntity.badRequest().body(StandardResponse.error("Error fetching users with role USER"));
         }
     }
-
 
 
     @PutMapping("/edit/{userId}")

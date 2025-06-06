@@ -18,7 +18,7 @@ public interface UserService {
 
     List<UserDTO> getUsersBySocietyId(Long societyId);
 
-    UserDTO getAdminBySocietyId(Long societyId);
+    public List<UserDTO> getAdminsBySocietyId(Long societyId);
 
     UserDTO editUser(Long userId, Map<String, Object> updates);
 

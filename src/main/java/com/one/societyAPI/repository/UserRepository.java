@@ -23,7 +23,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByFlat_Society_IdAndRole(Long societyId, UserRole role);
 
     // Get admin by society ID
-    Optional<User> findBySociety_IdAndRole(Long societyId, UserRole role);
+   // Optional<User> findBySociety_IdAndRole(Long societyId, UserRole role);
+
+    List<User> findBySociety_IdAndRole(Long societyId, UserRole role);
+
 
     List<User> findByFlat_Society_Id(Long id);
 
