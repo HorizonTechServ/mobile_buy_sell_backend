@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,37 +28,44 @@ public class ComplaintController {
         this.complaintService = complaintService;
     }
 
-    @PostMapping("/create")
-    @Operation(summary = "Add a complaint", description = "Add a new complaint")
+
+    @PostMapping(value = "/create", consumes = {"multipart/form-data"})
+    @Operation(summary = "Add a complaint", description = "Add a new complaint with optional image")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
     public ResponseEntity<StandardResponse<ComplaintDTO>> createComplaint(
             @RequestParam Long userId,
-            @RequestParam String description
+            @RequestParam String description,
+            @RequestParam(required = false) MultipartFile image
     ) {
         String method = "createComplaint";
         LOGGER.infoLog(CLASSNAME, method, "Received complaint creation request from userId: ", userId);
 
-        ComplaintDTO complaint = complaintService.createComplaint(userId, description);
+        ComplaintDTO complaint = complaintService.createComplaint(userId, description, image);
 
         LOGGER.infoLog(CLASSNAME, method, "Complaint created successfully with ID: ", complaint.id());
+
         return ResponseEntity.ok(StandardResponse.success("Complaint created successfully", complaint));
     }
 
-    @PostMapping("/resolve")
-    @Operation(summary = "Resolve complaint", description = "Super Admin and Admin can resolve complaints")
+
+    @PostMapping(value = "/resolve", consumes = {"multipart/form-data"})
+    @Operation(summary = "Resolve complaint", description = "Super Admin and Admin can resolve complaints with optional image and notes")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<StandardResponse<ComplaintDTO>> resolveComplaint(
             @RequestParam Long complaintId,
-            @RequestParam Long resolverId
+            @RequestParam Long resolverId,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) MultipartFile image
     ) {
         String method = "resolveComplaint";
-        LOGGER.infoLog(CLASSNAME, method, "Attempt to resolve complaintId: "+complaintId+ " by resolverId: ", resolverId);
+        LOGGER.infoLog(CLASSNAME, method, "Attempt to resolve complaintId: " + complaintId + " by resolverId: ", resolverId);
 
-        ComplaintDTO resolved = complaintService.resolveComplaint(complaintId, resolverId);
+        ComplaintDTO resolved = complaintService.resolveComplaint(complaintId, resolverId, description, image);
 
         LOGGER.infoLog(CLASSNAME, method, "Complaint resolved successfully. ID: ", resolved.id());
         return ResponseEntity.ok(StandardResponse.success("Complaint resolved successfully", resolved));
     }
+
 
     @GetMapping("/by-user/{userId}")
     @Operation(summary = "Get Complaint By User ID", description = "Get complaints by user ID")

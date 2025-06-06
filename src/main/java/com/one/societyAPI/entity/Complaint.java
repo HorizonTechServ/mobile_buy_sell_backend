@@ -31,6 +31,17 @@ public class Complaint {
 
     private String flatNumber; // Optional for faster reference
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private ComplaintImage image;
+
+    @Transient
+    private Long complaintImageId;
+
+    public Long getComplaintImageId() {
+        return image != null ? image.getId() : null;
+    }
+
     // Getters & Setters
 
     public Long getId() {
@@ -95,5 +106,17 @@ public class Complaint {
 
     public void setFlatNumber(String flatNumber) {
         this.flatNumber = flatNumber;
+    }
+
+    public ComplaintImage getImage() {
+        return image;
+    }
+
+    public void setImage(ComplaintImage image) {
+        this.image = image;
+    }
+
+    public void setComplaintImageId(Long complaintImageId) {
+        this.complaintImageId = complaintImageId;
     }
 }

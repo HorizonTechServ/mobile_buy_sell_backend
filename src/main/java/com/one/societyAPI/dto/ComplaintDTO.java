@@ -13,5 +13,7 @@ public record ComplaintDTO(
         ComplaintStatus status,
         String description,
         LocalDateTime complaintDate,
-        LocalDateTime resolvedDate
+        LocalDateTime resolvedDate,
+        String complaintImage,       // Base64 string
+        Long complaintImageId        // Optional, useful if needed
 ) {}
