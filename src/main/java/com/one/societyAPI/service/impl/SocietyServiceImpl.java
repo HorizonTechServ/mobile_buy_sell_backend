@@ -85,4 +85,34 @@ public class SocietyServiceImpl implements SocietyService {
         return result;
     }
 
+    @Override
+    public Society updateSociety(Long id, CreateSocietyRequest request) {
+        Society existingSociety = societyRepository.findById(id)
+                .orElseThrow(() -> new SocietyException("Society not found with id: " + id));
+
+        existingSociety.setName(request.getName());
+        existingSociety.setAddress(request.getAddress());
+        existingSociety.setTotalFlats(request.getTotalFlats());
+
+        if (request.getFlats() != null) {
+            List<String> existingFlatNumbers = existingSociety.getFlats().stream()
+                    .map(Flat::getFlatNumber)
+                    .toList();
+
+            for (var flatRequest : request.getFlats()) {
+                if (!existingFlatNumbers.contains(flatRequest.getFlatNumber())) {
+                    Flat flat = new Flat();
+                    flat.setFlatNumber(flatRequest.getFlatNumber());
+                    flat.setBlock(flatRequest.getBlock());
+                    flat.setOwnerName(flatRequest.getOwnerName());
+                    flat.setSociety(existingSociety);
+                    existingSociety.getFlats().add(flat);
+                }
+            }
+        }
+
+        return societyRepository.save(existingSociety);
+    }
+
+
 }

@@ -12,4 +12,5 @@ public interface SocietyService {
     Society getSocietyById(Long id);
     void deleteSociety(Long id);
     public Map<String, Object> getFlatsBySocietyId(Long societyId);
+    Society updateSociety(Long id, CreateSocietyRequest request);
 }

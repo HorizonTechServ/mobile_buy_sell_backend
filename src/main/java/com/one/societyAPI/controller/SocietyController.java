@@ -86,4 +86,21 @@ public class SocietyController {
         return ResponseEntity.ok(StandardResponse.success("Flats fetched successfully", flatMap));
     }
 
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update existing Society", description = "Update a society by its ID")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<StandardResponse<Society>> updateSociety(
+            @PathVariable Long id,
+            @RequestBody CreateSocietyRequest request) {
+        String method = "updateSociety";
+        LOGGER.infoLog(CLASSNAME, method, "Received request to update society with ID: ", id);
+
+        Society updatedSociety = societyService.updateSociety(id, request);
+
+        LOGGER.infoLog(CLASSNAME, method, "Successfully updated society with ID: ", updatedSociety.getId());
+        return ResponseEntity.ok(StandardResponse.success("Society updated successfully", updatedSociety));
+    }
+
+
 }

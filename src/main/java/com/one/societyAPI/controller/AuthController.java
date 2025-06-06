@@ -1,6 +1,7 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.LoginRequest;
+import com.one.societyAPI.dto.RefreshTokenRequest;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.logger.DefaultLogger;
 import com.one.societyAPI.repository.UserRepository;
@@ -9,6 +10,7 @@ import com.one.societyAPI.service.UserService;
 import com.one.societyAPI.utils.JwtUtil;
 import com.one.societyAPI.utils.UserRole;
 import com.one.societyAPI.utils.UserStatus;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +82,10 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getMobileNumber());
         Date expirationDate = jwtUtil.extractExpiration(token);
 
+
+        // Refresh Token Code
+        String refreshToken = jwtUtil.generateRefreshToken(user.getMobileNumber());
+
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("token", token);
         responseData.put("expires_at", expirationDate.toString());
@@ -89,6 +95,9 @@ public class AuthController {
         responseData.put("name", user.getName());
         responseData.put("role", user.getRole().name());
 
+        // Added Refresh Token Fields
+        responseData.put("refreshToken", refreshToken);
+
         responseData.put("userId", user.getId());
         if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.USER) {
             responseData.put("societyId", user.getSociety().getId());
@@ -96,6 +105,39 @@ public class AuthController {
 
         LOGGER.infoLog(CLASSNAME, method, "Login successful for user: " + request.getMobileNumber());
         return ResponseEntity.ok(StandardResponse.success("Login successfully", responseData));
+    }
+
+
+    @PostMapping("/refresh-token")
+    @Operation(summary = "Generate new access token using a valid refresh token")
+    public ResponseEntity<StandardResponse<Map<String, Object>>> refreshToken(@RequestBody RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        try {
+            // Extract username and check if refresh token is valid
+            String username = jwtUtil.extractUsername(refreshToken);
+
+            if (!jwtUtil.isTokenValid(refreshToken, username)) {
+                return ResponseEntity.status(401).body(StandardResponse.error("Invalid or expired refresh token"));
+
+            }
+
+            // Generate new access token and new refresh token
+            String newAccessToken = jwtUtil.generateToken(username);
+            String newRefreshToken = jwtUtil.generateRefreshToken(username);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("access_token", newAccessToken);
+            response.put("refresh_token", newRefreshToken);
+            response.put("expires_at", jwtUtil.extractExpiration(newAccessToken).getTime());
+
+            return ResponseEntity.ok(StandardResponse.success("Refresh Token successfully", response));
+
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(StandardResponse.error("Could not refresh token"));
+
+        }
     }
 
 }
