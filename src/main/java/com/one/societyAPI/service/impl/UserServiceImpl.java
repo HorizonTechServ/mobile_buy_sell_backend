@@ -1,5 +1,6 @@
 package com.one.societyAPI.service.impl;
 
+import com.one.societyAPI.dto.FlatRequest;
 import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.entity.Flat;
 import com.one.societyAPI.entity.MaintenancePayment;
@@ -205,6 +206,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+/*
     private UserDTO toDTO(User user) {
         // Fetch payments for this user
         List<MaintenancePayment> payments = paymentRepository.findByUser(user);
@@ -228,4 +230,32 @@ public class UserServiceImpl implements UserService {
                 maintenanceStatus // <- add this here
         );
     }
+*/
+
+    private UserDTO toDTO(User user) {
+        // Get payments for status
+        List<MaintenancePayment> payments = paymentRepository.findByUser(user);
+        boolean hasPending = payments.stream()
+                .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING);
+        String maintenanceStatus = hasPending ? "PENDING" : "PAID";
+
+        // Create FlatDTO if flat is assigned
+       // FlatRequest flatDTO = user.getFlat() != null ? new FlatRequest(user.getFlat()) : null;
+
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getMobileNumber(),
+                user.getGender(),
+                user.getRole(),
+                user.getStatus(),
+                user.getLastLogin(),
+                user.getCreatedAt(),
+                maintenanceStatus,
+                user.getFlat() != null ? new FlatRequest(user.getFlat()) : null
+
+        );
+    }
+
 }
