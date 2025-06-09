@@ -331,4 +331,24 @@ public class UserController {
                     .body(StandardResponse.error("Failed to change password"));
         }
     }
+
+
+    @PostMapping("/reminder/send-maintenance-reminder/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @Operation(summary = "Send maintenance reminder email to a user")
+    public ResponseEntity<StandardResponse<?>> sendMaintenanceReminder(@PathVariable Long userId) {
+        String method = "sendMaintenanceReminder";
+        LOGGER.infoLog(CLASSNAME, method, "Sending reminder to userId: ", userId);
+        try {
+            userService.sendMaintenanceReminderIfPending(userId);
+            return ResponseEntity.ok(StandardResponse.success("Reminder sent successfully", null));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.errorLog(CLASSNAME, method, "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(StandardResponse.error("Failed to send reminder"));
+        }
+    }
+
 }

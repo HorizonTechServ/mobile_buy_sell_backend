@@ -13,6 +13,7 @@ import com.one.societyAPI.repository.FlatRepository;
 import com.one.societyAPI.repository.MaintenancePaymentRepository;
 import com.one.societyAPI.repository.SocietyRepository;
 import com.one.societyAPI.repository.UserRepository;
+import com.one.societyAPI.service.EmailService;
 import com.one.societyAPI.service.UserService;
 import com.one.societyAPI.utils.PaymentStatus;
 import com.one.societyAPI.utils.UserRole;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,16 +35,17 @@ public class UserServiceImpl implements UserService {
     private final SocietyRepository societyRepository;
     private final FlatRepository flatRepository;
     private final MaintenancePaymentRepository paymentRepository;
-
+    private final EmailService emailService;
 
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, SocietyRepository societyRepository, FlatRepository flatRepository, MaintenancePaymentRepository paymentRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, SocietyRepository societyRepository, FlatRepository flatRepository, MaintenancePaymentRepository paymentRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.societyRepository = societyRepository;
         this.flatRepository = flatRepository;
         this.paymentRepository = paymentRepository;
+        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -188,6 +191,39 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public void sendMaintenanceReminderIfPending(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User not found"));
+
+        // Fetch all maintenance payments for the user
+        List<MaintenancePayment> payments = paymentRepository.findByUser(user);
+
+        // Find the first pending payment (you can change to find latest, etc.)
+        Optional<MaintenancePayment> pendingPaymentOpt = payments.stream()
+                .filter(p -> p.getStatus() == PaymentStatus.PENDING)
+                .findFirst();
+
+        if (pendingPaymentOpt.isEmpty()) {
+            throw new IllegalStateException("User has already paid maintenance.");
+        }
+
+        MaintenancePayment pendingPayment = pendingPaymentOpt.get();
+        Double amount = pendingPayment.getMaintenance().getAmount();
+
+        // Compose and send email
+        String to = user.getEmail();
+        String subject = "Maintenance Payment Reminder";
+        String body = "Dear " + user.getName() + ",\n\n"
+                + "You have pending maintenance payment for your flat (Flat No: "
+                + user.getFlat().getFlatNumber() + ").\n"
+                + "Amount Due: ₹" + amount + "\n"
+                + "Please make the payment at the earliest.\n\n"
+                + "Regards,\nSociety Management Team";
+
+        emailService.sendEmail(to, subject, body);
+    }
+
 
     // ---------- Private Utility Methods ----------
     private void validateUser(User user) {
@@ -206,32 +242,6 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-/*
-    private UserDTO toDTO(User user) {
-        // Fetch payments for this user
-        List<MaintenancePayment> payments = paymentRepository.findByUser(user);
-
-        // Determine maintenance status
-        boolean hasPending = payments.stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING);
-
-        String maintenanceStatus = hasPending ? "PENDING" : "PAID";
-
-        return new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getMobileNumber(),
-                user.getGender(),
-                user.getRole(),
-                user.getStatus(),
-                user.getLastLogin(),
-                user.getCreatedAt(),
-                maintenanceStatus // <- add this here
-        );
-    }
-*/
-
     private UserDTO toDTO(User user) {
         // Get payments for status
         List<MaintenancePayment> payments = paymentRepository.findByUser(user);
@@ -239,8 +249,11 @@ public class UserServiceImpl implements UserService {
                 .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING);
         String maintenanceStatus = hasPending ? "PENDING" : "PAID";
 
-        // Create FlatDTO if flat is assigned
-       // FlatRequest flatDTO = user.getFlat() != null ? new FlatRequest(user.getFlat()) : null;
+
+        Double maintenanceAmount = payments.stream()
+                .findFirst() // You can change this logic to get latest or pending one
+                .map(p -> p.getMaintenance().getAmount())
+                .orElse(0.0);
 
         return new UserDTO(
                 user.getId(),
@@ -253,8 +266,8 @@ public class UserServiceImpl implements UserService {
                 user.getLastLogin(),
                 user.getCreatedAt(),
                 maintenanceStatus,
-                user.getFlat() != null ? new FlatRequest(user.getFlat()) : null
-
+                user.getFlat() != null ? new FlatRequest(user.getFlat()) : null,
+                maintenanceAmount // <-- Include this in UserDTO
         );
     }
 

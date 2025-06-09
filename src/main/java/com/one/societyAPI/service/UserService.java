@@ -26,4 +26,6 @@ public interface UserService {
 
     List<UserDTO> getUsersBySocietyIdAndRoleUser(Long societyId);
 
+    public void sendMaintenanceReminderIfPending(Long userId);
+
 }
