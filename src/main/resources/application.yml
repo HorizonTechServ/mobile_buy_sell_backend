@@ -47,6 +47,7 @@ spring:
     #username: m00nSocietry
     #password: m00nSocietry
 
+
     url: jdbc:mysql://localhost:3306/society
     username: root
     password: root
