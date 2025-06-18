@@ -56,8 +56,8 @@ This is a RESTful API for a **Society Management System**, designed to streamlin
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/vimal8086/SocietyManagement.git
-   cd SocietyManagement-api
+   git clone https://github.com/HorizonTechServ/society-mate-backend.git
+   cd society-mate-backend
 
 ## ⚙️ Swagger URL
 
