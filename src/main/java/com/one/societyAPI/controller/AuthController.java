@@ -129,7 +129,7 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("access_token", newAccessToken);
             response.put("refresh_token", newRefreshToken);
-            response.put("expires_at", jwtUtil.extractExpiration(newAccessToken).getTime());
+            response.put("expires_at", jwtUtil.extractExpiration(newRefreshToken).getTime());
 
             return ResponseEntity.ok(StandardResponse.success("Refresh Token successfully", response));
 
