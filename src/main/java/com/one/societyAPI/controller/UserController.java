@@ -183,6 +183,23 @@ public class UserController {
     }
 
 
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
+    @Operation(summary = "Get user by userId", description = "Fetch a single user by ID without exposing password")
+    public ResponseEntity<StandardResponse<UserDTO>> getUserById(@PathVariable Long userId) {
+        String method = "getUserById";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching user by ID: " + userId);
+
+        try {
+            UserDTO userDTO = userService.getUserDetailsById(userId);
+            return ResponseEntity.ok(StandardResponse.success("User fetched successfully", userDTO));
+        } catch (UserException e) {
+            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(StandardResponse.error(e.getMessage()));
+        }
+    }
+
     @PutMapping("/edit/{userId}")
     @PreAuthorize("hasAnyRole('USER','ADMIN', 'SUPER_ADMIN')")
     @Operation(summary = "Edit User Details", description = "Update user name, mobile number, or flat number")

@@ -114,6 +114,27 @@ public class UserServiceImpl implements UserService {
         return admins.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public UserDTO getUserDetailsById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("User not found with ID: " + userId));
+
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getMobileNumber(),
+                user.getGender(),
+                user.getRole(),
+                user.getStatus(),
+                user.getLastLogin(),
+                user.getCreatedAt(),
+                null, // maintenanceStatus – set if needed
+                null, // flat – skipping flat details as per your request
+                null  // maintenanceAmount – optional
+        );
+    }
+
 
     @Override
     @Transactional

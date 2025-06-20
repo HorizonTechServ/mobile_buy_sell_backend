@@ -28,4 +28,5 @@ public interface UserService {
 
     public void sendMaintenanceReminderIfPending(Long userId);
 
+    UserDTO getUserDetailsById(Long userId);
 }

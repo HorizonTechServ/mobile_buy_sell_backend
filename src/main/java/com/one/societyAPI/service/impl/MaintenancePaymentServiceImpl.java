@@ -102,7 +102,8 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
                 p.getStatus(),
                 p.getPaymentDate(),
                 p.getMaintenance().getDueDate(),
-                p.getUser().getFlat().getFlatNumber()
-        );
+                p.getUser().getFlat().getFlatNumber(),
+                p.getMaintenance().getAmount()
+                );
     }
 }

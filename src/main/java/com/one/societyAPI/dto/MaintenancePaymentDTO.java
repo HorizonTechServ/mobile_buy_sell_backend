@@ -12,5 +12,6 @@ public record MaintenancePaymentDTO(
         PaymentStatus status,
         LocalDate paymentDate,
         LocalDate dueDate,
-        String flatNumber
+        String flatNumber,
+        Double amount
 ) {}
