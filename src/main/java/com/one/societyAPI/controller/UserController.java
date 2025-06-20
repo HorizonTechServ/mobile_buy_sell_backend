@@ -15,13 +15,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -166,7 +173,6 @@ public class UserController {
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
-
 
     @GetMapping("/getAllUser/by-society/{societyId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
@@ -368,4 +374,54 @@ public class UserController {
         }
     }
 
+
+    @PutMapping(value = "/upload-profile-picture/{userId}", consumes = "multipart/form-data")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SUPER_ADMIN')")
+    @Operation(summary = "Upload/Update Profile Picture", description = "Upload or update user's profile picture after registration")
+    public ResponseEntity<StandardResponse<String>> uploadProfilePicture(
+            @PathVariable Long userId,
+            @RequestParam("image") MultipartFile imageFile) {
+
+        String method = "uploadProfilePicture";
+        LOGGER.infoLog(CLASSNAME, method, "Uploading profile picture for userId: ", userId);
+
+        try {
+            userService.updateUserProfilePicture(userId, imageFile);
+            return ResponseEntity.ok(StandardResponse.success("Profile picture uploaded successfully", null));
+        } catch (Exception e) {
+            LOGGER.errorLog(CLASSNAME, method, "Upload failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(StandardResponse.error("Image upload failed"));
+        }
+    }
+
+    @GetMapping("/profile-picture/{userId}")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SUPER_ADMIN')")
+    @Operation(summary = "Get User Profile Picture", description = "Fetch user's profile picture or error")
+    public ResponseEntity<?> getUserProfilePicture(@PathVariable Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(StandardResponse.error("User not found with ID: " + userId));
+        }
+
+        byte[] imageBytes = userOpt.get().getProfilePicture();
+
+        if (imageBytes == null || imageBytes.length == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(StandardResponse.error("No profile picture found for user ID: " + userId));
+        }
+
+        // Auto-detect content type
+        String contentType = "application/octet-stream";
+        try (InputStream is = new ByteArrayInputStream(imageBytes)) {
+            String guessed = URLConnection.guessContentTypeFromStream(is);
+            if (guessed != null) contentType = guessed;
+        } catch (IOException ignored) {}
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(contentType));
+
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
 }

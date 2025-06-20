@@ -62,6 +62,10 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Lob
+    @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
+    private byte[] profilePicture;
+
     @ManyToOne
     @JoinColumn(name = "society_id")
     @JsonBackReference // 🔁 Avoid circular reference with Society

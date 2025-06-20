@@ -2,7 +2,9 @@ package com.one.societyAPI.service;
 
 import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +31,7 @@ public interface UserService {
     public void sendMaintenanceReminderIfPending(Long userId);
 
     UserDTO getUserDetailsById(Long userId);
+
+    public void updateUserProfilePicture(Long userId, MultipartFile file) throws IOException;
+
 }

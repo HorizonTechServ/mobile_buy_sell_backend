@@ -21,7 +21,9 @@ import com.one.societyAPI.utils.UserStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -243,6 +245,19 @@ public class UserServiceImpl implements UserService {
                 + "Regards,\nSociety Management Team";
 
         emailService.sendEmail(to, subject, body);
+    }
+
+
+    @Override
+    public void updateUserProfilePicture(Long userId, MultipartFile file) throws IOException {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new UserException("User not found");
+        }
+
+        User user = userOpt.get();
+        user.setProfilePicture(file.getBytes());
+        userRepository.save(user);
     }
 
 
