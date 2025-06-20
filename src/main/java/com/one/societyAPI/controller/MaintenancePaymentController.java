@@ -80,4 +80,26 @@ public class MaintenancePaymentController {
         LOGGER.infoLog(CLASSNAME, method, "Fetched " + list.size() + " filtered payment records", 200L);
         return ResponseEntity.ok(StandardResponse.success("Filtered payments fetched successfully", list));
     }
+
+
+    @GetMapping("/user/{userId}/pending")
+    @Operation(summary = "Get all pending maintenance payments by user ID", description = "Fetches all maintenance payments for a user where status is PENDING, optionally filtered by month and year")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
+    public ResponseEntity<StandardResponse<List<MaintenancePaymentDTO>>> getPendingPaymentsByUserId(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ) {
+        String method = "getPendingPaymentsByUserId";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching pending payments for user ID " + userId +
+                (month != null ? ", month " + month : "") +
+                (year != null ? ", year " + year : ""));
+
+        List<MaintenancePaymentDTO> result = paymentService.getPendingPaymentsByUserId(userId, month, year);
+
+        LOGGER.infoLog(CLASSNAME, method, "Fetched " + result.size() + " pending payment records", 200L);
+        return ResponseEntity.ok(StandardResponse.success("Pending payments fetched successfully", result));
+    }
+
+
 }

@@ -52,10 +52,10 @@ spring:
     username: root
     password: root
 
-    #url: ${ENV_DB_URL:jdbc:mysql://13.203.86.197:3306/society}
-    #username: ${ENV_DB_USERNAME:society}
-    #password: ${ENV_DB_PASSWORD:password}
-    #driver-class-name: com.mysql.cj.jdbc.Driver
+    #url: ${ENV_DB_URL:jdbc:mysql://13.233.142.6:3306/society}
+    #username: ${ENV_DB_USERNAME:m00nSocietry}
+    #password: ${ENV_DB_PASSWORD:m00nSocietry}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
         database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -68,7 +68,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: Motionsorange@gmail.com
-    password: hxmg oqmz aegg txlr
+    password: qfei kzld eezj xuuz
     properties:
       mail:
         smtp:
@@ -87,8 +87,8 @@ springdoc:
 
 jwt:
   secret: "c2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC1hdXRoZW50aWNhdGlvbg=="  # Replace with a strong secret key
-  expirationMs: 300000       # Token expiration time in milliseconds (e.g., 5 min)
-  refreshExpirationMs: 604800000 # 7 days validity for refresh token
+  expirationMs: 7200000       # Token expiration time in milliseconds (e.g., 2 hour)
+  refreshExpirationMs: 604800000 # 7 days validity for refresh token (604800000)
 
 management:
   endpoints:

@@ -76,6 +76,22 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<MaintenancePaymentDTO> getPendingPaymentsByUserId(Long userId, Integer month, Integer year) {
+        List<MaintenancePayment> payments;
+
+        if (month != null && year != null) {
+            payments = paymentRepository.findByUserIdAndStatusAndMonthAndYear(userId, PaymentStatus.PENDING, month, year);
+        } else {
+            payments = paymentRepository.findByUserIdAndStatus(userId, PaymentStatus.PENDING);
+        }
+
+        return payments.stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+
 
     private MaintenancePaymentDTO toDTO(MaintenancePayment p) {
         return new MaintenancePaymentDTO(

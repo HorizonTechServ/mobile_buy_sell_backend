@@ -33,4 +33,14 @@ public interface MaintenancePaymentRepository extends JpaRepository<MaintenanceP
     );
 
     List<MaintenancePayment> findByUser(User user);
+
+    List<MaintenancePayment> findByUserIdAndStatus(Long userId, PaymentStatus status);
+
+    @Query("SELECT m FROM MaintenancePayment m WHERE m.user.id = :userId AND m.status = :status AND MONTH(m.maintenance.dueDate) = :month AND YEAR(m.maintenance.dueDate) = :year")
+    List<MaintenancePayment> findByUserIdAndStatusAndMonthAndYear(@Param("userId") Long userId,
+                                                                  @Param("status") PaymentStatus status,
+                                                                  @Param("month") int month,
+                                                                  @Param("year") int year);
+
+
 }
