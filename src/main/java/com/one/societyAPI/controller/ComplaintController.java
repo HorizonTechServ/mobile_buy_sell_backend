@@ -50,7 +50,7 @@ public class ComplaintController {
 
     @PostMapping(value = "/resolve", consumes = {"multipart/form-data"})
     @Operation(summary = "Resolve complaint", description = "Super Admin and Admin can resolve complaints with optional image and notes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
     public ResponseEntity<StandardResponse<ComplaintDTO>> resolveComplaint(
             @RequestParam Long complaintId,
             @RequestParam Long resolverId,

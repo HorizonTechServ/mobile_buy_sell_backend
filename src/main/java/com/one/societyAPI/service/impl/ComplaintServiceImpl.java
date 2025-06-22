@@ -69,10 +69,10 @@ public class ComplaintServiceImpl implements ComplaintService {
         User resolver = userRepository.findById(resolverId)
                 .orElseThrow(() -> new UserException("Resolver not found with resolverId : " + resolverId));
 
-        if (resolver.getRole().equals(UserRole.USER)) {
+      /*  if (resolver.getRole().equals(UserRole.USER)) {
             throw new UserException("Only Admin or Super Admin can resolve complaints");
         }
-
+*/
         complaint.setResolvedBy(resolver);
         complaint.setStatus(ComplaintStatus.RESOLVED);
         complaint.setResolvedDate(LocalDateTime.now());
