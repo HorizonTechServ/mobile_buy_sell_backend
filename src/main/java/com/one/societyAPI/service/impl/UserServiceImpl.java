@@ -210,6 +210,11 @@ public class UserServiceImpl implements UserService {
             user.setFlat(flat);
         }
 
+        // Add gender field update
+        if (updates.containsKey("gender")) {
+            user.setGender((String) updates.get("gender"));
+        }
+
         return toDTO(userRepository.save(user));
     }
 
