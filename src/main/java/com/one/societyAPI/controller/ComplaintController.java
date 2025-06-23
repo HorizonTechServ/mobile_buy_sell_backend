@@ -1,7 +1,9 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.ComplaintDTO;
+import com.one.societyAPI.entity.ChatMessage;
 import com.one.societyAPI.logger.DefaultLogger;
+import com.one.societyAPI.repository.ChatMessageRepository;
 import com.one.societyAPI.response.StandardResponse;
 import com.one.societyAPI.service.ComplaintService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,8 +26,11 @@ public class ComplaintController {
 
     private final ComplaintService complaintService;
 
-    public ComplaintController(ComplaintService complaintService) {
+    private final ChatMessageRepository chatMessageRepository;
+
+    public ComplaintController(ComplaintService complaintService, ChatMessageRepository chatMessageRepository) {
         this.complaintService = complaintService;
+        this.chatMessageRepository = chatMessageRepository;
     }
 
 
@@ -118,4 +123,13 @@ public class ComplaintController {
         LOGGER.debugLog(CLASSNAME, method, "Found " +resolvedComplaints.size() + " resolved complaints for societyId: ",  + societyId);
         return ResponseEntity.ok(StandardResponse.success("Fetched resolved complaints", resolvedComplaints));
     }
+
+    @GetMapping("/chat/{complaintId}")
+    @Operation(summary = "Get chat messages by complaint", description = "Returns chat history for the given complaint")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
+    public ResponseEntity<StandardResponse<List<ChatMessage>>> getChatHistory(@PathVariable Long complaintId) {
+        List<ChatMessage> messages = chatMessageRepository.findByComplaintIdOrderByTimestampAsc(complaintId);
+        return ResponseEntity.ok(StandardResponse.success("Fetched chat history", messages));
+    }
+
 }
