@@ -92,6 +92,10 @@ dependencies {
 
 	// This is For Web Socket Internal chat messaging
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// For Firebase Notification
+	implementation 'com.google.firebase:firebase-admin:9.2.0' // use latest version
+
 }
 
 dependencyManagement {

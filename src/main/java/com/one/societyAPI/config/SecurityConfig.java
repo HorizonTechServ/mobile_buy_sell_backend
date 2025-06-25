@@ -47,7 +47,19 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+
+                                // New Added For Web Socket
+                                "/",
+                                "/index.html",
+                                "/chat-tester.html",
+                                "/js/**",
+                                "/css/**",
+                                "/webjars/**",
+                                "/society/api/ws-chat/**",
+                                "/ws-chat/**",                         // fallback
+                                "/society/api/chat-tester.html" // ✅ Test HTML page
+
                         ).permitAll()
                         .requestMatchers("/auth", "/error", "/auth/**", "/users/register/superAdmin",
                                 "/users/reset-password",

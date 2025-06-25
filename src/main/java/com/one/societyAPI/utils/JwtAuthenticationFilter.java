@@ -55,6 +55,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/society/api/users/reset-password") ||
                 requestURI.equals("/society/api/error") ||
                 requestURI.equals("/society/api/auth/login") ||
+
+                // New Added For Web Socket Testing
+                requestURI.startsWith("/society/api/chat-tester.html") ||
+                requestURI.startsWith("/society/api/ws-chat") ||
+                requestURI.startsWith("/society/api/ws-chat/") ||
+                requestURI.startsWith("/sockjs-node") ||
+                requestURI.startsWith("/websocket") ||
+                requestURI.contains("info") ||
+
                 requestURI.equals("/society/api/users/register/superAdmin")) {
             filterChain.doFilter(request, response);
             return;
