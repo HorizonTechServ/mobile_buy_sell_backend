@@ -15,6 +15,10 @@ logging:
     root: ${ENV_ROOT_LOG_LEVEL:INFO}
     com.one: ${ENV_ONE_LOG_LEVEL:DEBUG}
 
+firebase:
+  config:
+    path: config/firebase/firebase-service-account.json
+
 spring:
   servlet:
     multipart:

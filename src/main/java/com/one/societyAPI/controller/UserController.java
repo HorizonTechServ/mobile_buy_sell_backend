@@ -4,11 +4,14 @@ import com.one.societyAPI.dto.AdminRegisterRequest;
 import com.one.societyAPI.dto.ChangePasswordRequest;
 import com.one.societyAPI.dto.UserDTO;
 import com.one.societyAPI.dto.UserRegisterRequest;
+import com.one.societyAPI.entity.FcmToken;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.logger.DefaultLogger;
+import com.one.societyAPI.repository.FcmTokenRepository;
 import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.response.StandardResponse;
+import com.one.societyAPI.service.FcmTokenService;
 import com.one.societyAPI.service.OtpService;
 import com.one.societyAPI.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,9 +57,23 @@ public class UserController {
     private OtpService otpService;
 
     @Autowired
+    private FcmTokenService fcmTokenService;
+
+    @Autowired
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+
+    @PostMapping("/update-fcm-token")
+    @Operation(summary = "Update FCM token of user", description = "Registers the FCM token to the user")
+    public ResponseEntity<String> updateFcmToken(
+            @RequestParam Long userId,
+            @RequestParam String fcmToken
+    ) {
+        fcmTokenService.registerFcmToken(userId, fcmToken);
+        return ResponseEntity.ok("FCM token registered successfully.");
     }
 
     @PostMapping("/register/superAdmin")

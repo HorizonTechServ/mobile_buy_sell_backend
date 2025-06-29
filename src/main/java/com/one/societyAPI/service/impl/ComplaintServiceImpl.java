@@ -9,6 +9,7 @@ import com.one.societyAPI.repository.ComplaintRepository;
 import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.service.ComplaintImageService;
 import com.one.societyAPI.service.ComplaintService;
+import com.one.societyAPI.service.FirebaseNotificationService;
 import com.one.societyAPI.utils.ComplaintStatus;
 import com.one.societyAPI.utils.UserRole;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,14 @@ public class ComplaintServiceImpl implements ComplaintService {
     private final ComplaintRepository complaintRepository;
     private final UserRepository userRepository;
     private final ComplaintImageService complaintImageService;
+    private final FirebaseNotificationService firebaseNotificationService;
 
 
-    public ComplaintServiceImpl(ComplaintRepository complaintRepository, UserRepository userRepository, ComplaintImageService complaintImageService) {
+    public ComplaintServiceImpl(ComplaintRepository complaintRepository, UserRepository userRepository, ComplaintImageService complaintImageService, FirebaseNotificationService firebaseNotificationService) {
         this.complaintRepository = complaintRepository;
         this.userRepository = userRepository;
         this.complaintImageService = complaintImageService;
+        this.firebaseNotificationService = firebaseNotificationService;
     }
 
     @Override
@@ -58,6 +61,14 @@ public class ComplaintServiceImpl implements ComplaintService {
 
         Complaint savedComplaint = complaintRepository.save(complaint);
 
+
+        // ✅ Send notification to all admin devices
+        firebaseNotificationService.sendNotificationToUsers(
+                userRepository.findAllByRole(UserRole.ADMIN),
+                "New Complaint Added",
+                "User " + user.getName() + " submitted a complaint."
+        );
+
         return toDTO(savedComplaint);
     }
 
@@ -69,10 +80,6 @@ public class ComplaintServiceImpl implements ComplaintService {
         User resolver = userRepository.findById(resolverId)
                 .orElseThrow(() -> new UserException("Resolver not found with resolverId : " + resolverId));
 
-      /*  if (resolver.getRole().equals(UserRole.USER)) {
-            throw new UserException("Only Admin or Super Admin can resolve complaints");
-        }
-*/
         complaint.setResolvedBy(resolver);
         complaint.setStatus(ComplaintStatus.RESOLVED);
         complaint.setResolvedDate(LocalDateTime.now());
@@ -90,7 +97,29 @@ public class ComplaintServiceImpl implements ComplaintService {
             }
         }
 
-        return toDTO(complaintRepository.save(complaint));
+        Complaint saved = complaintRepository.save(complaint);
+
+        // 🔔 Notify based on resolver role
+        if (resolver.getRole() == UserRole.ADMIN) {
+            // Admin resolved — notify complaint owner (user)
+            User complaintUser = complaint.getComplaintBy();
+            firebaseNotificationService.sendNotificationToUsers(
+                    List.of(complaintUser),
+                    "Your Complaint is Resolved",
+                    "Admin " + resolver.getName() + " resolved your complaint."
+            );
+
+        } else if (resolver.getRole() == UserRole.USER) {
+            // User marked as resolved — notify all admins
+            List<User> admins = userRepository.findAllByRole(UserRole.ADMIN);
+            firebaseNotificationService.sendNotificationToUsers(
+                    admins,
+                    "Complaint Resolved by User",
+                    "User " + resolver.getName() + " marked their complaint as resolved."
+            );
+        }
+
+        return toDTO(saved);
     }
 
 

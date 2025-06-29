@@ -2,8 +2,10 @@ package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.LoginRequest;
 import com.one.societyAPI.dto.RefreshTokenRequest;
+import com.one.societyAPI.entity.FcmToken;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.logger.DefaultLogger;
+import com.one.societyAPI.repository.FcmTokenRepository;
 import com.one.societyAPI.repository.UserRepository;
 import com.one.societyAPI.response.StandardResponse;
 import com.one.societyAPI.service.UserService;
@@ -34,12 +36,14 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final FcmTokenRepository fcmTokenRepository;
 
-    public AuthController(UserService userService, UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+    public AuthController(UserService userService, UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, FcmTokenRepository fcmTokenRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        this.fcmTokenRepository = fcmTokenRepository;
     }
 
     @GetMapping("/check-user/{mobileNumber}")
@@ -106,6 +110,39 @@ public class AuthController {
         LOGGER.infoLog(CLASSNAME, method, "Login successful for user: " + request.getMobileNumber());
         return ResponseEntity.ok(StandardResponse.success("Login successfully", responseData));
     }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user and remove FCM token")
+    public ResponseEntity<StandardResponse<String>> logout(
+            @RequestParam Long userId,
+            @RequestParam String fcmToken) {
+
+        String method = "logout";
+        LOGGER.infoLog(CLASSNAME, method, "Logout request from userId: " + userId);
+
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            LOGGER.warnLog(CLASSNAME, method, "User not found for ID: " + userId);
+            return ResponseEntity.status(404).body(StandardResponse.error("User not found"));
+        }
+
+        Optional<FcmToken> tokenOpt = fcmTokenRepository.findByToken(fcmToken);
+        if (tokenOpt.isPresent()) {
+            FcmToken token = tokenOpt.get();
+            if (token.getUser().getId().equals(userId)) {
+                fcmTokenRepository.delete(token);
+                LOGGER.infoLog(CLASSNAME, method, "FCM token removed successfully for userId: " + userId);
+            } else {
+                LOGGER.warnLog(CLASSNAME, method, "Token-user mismatch: token not deleted.");
+                return ResponseEntity.status(400).body(StandardResponse.error("Token doesn't belong to the user"));
+            }
+        } else {
+            LOGGER.warnLog(CLASSNAME, method, "FCM token not found for removal.");
+        }
+
+        return ResponseEntity.ok(StandardResponse.success("Logout successful and token removed", userOpt.toString()));
+    }
+
 
 
     @PostMapping("/refresh-token")
