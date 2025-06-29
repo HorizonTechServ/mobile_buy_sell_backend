@@ -9,6 +9,7 @@ import com.one.societyAPI.exception.UserException;
 import com.one.societyAPI.repository.MaintenancePaymentRepository;
 import com.one.societyAPI.repository.MaintenanceRepository;
 import com.one.societyAPI.repository.UserRepository;
+import com.one.societyAPI.service.FirebaseNotificationService;
 import com.one.societyAPI.service.MaintenancePaymentService;
 import com.one.societyAPI.utils.PaymentStatus;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,14 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
     private final MaintenanceRepository maintenanceRepository;
     private final UserRepository userRepository;
     private final MaintenancePaymentRepository paymentRepository;
+    private final FirebaseNotificationService firebaseNotificationService;
 
-    public MaintenancePaymentServiceImpl(MaintenanceRepository maintenanceRepository, UserRepository userRepository, MaintenancePaymentRepository paymentRepository) {
+
+    public MaintenancePaymentServiceImpl(MaintenanceRepository maintenanceRepository, UserRepository userRepository, MaintenancePaymentRepository paymentRepository, FirebaseNotificationService firebaseNotificationService) {
         this.maintenanceRepository = maintenanceRepository;
         this.userRepository = userRepository;
         this.paymentRepository = paymentRepository;
+        this.firebaseNotificationService = firebaseNotificationService;
     }
 
     @Override
@@ -58,7 +62,19 @@ public class MaintenancePaymentServiceImpl implements MaintenancePaymentService 
 
         payment.setPaymentDate(status == PaymentStatus.PAID ? LocalDate.now() : null);
 
-        return toDTO(paymentRepository.save(payment));
+        //return toDTO(paymentRepository.save(payment));
+
+        MaintenancePayment updated = paymentRepository.save(payment);
+
+        // ✅ Notify the user if payment status changed to PAID
+        if (status == PaymentStatus.PAID) {
+            firebaseNotificationService.sendNotificationToUsers(
+                    List.of(user),
+                    "Maintenance Marked as Paid",
+                    "Your maintenance for " + maintenance.getDescription() + " has been marked as PAID."
+            );
+        }
+        return toDTO(updated);
     }
 
     @Override

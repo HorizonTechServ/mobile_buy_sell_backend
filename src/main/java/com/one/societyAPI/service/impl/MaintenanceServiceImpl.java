@@ -10,6 +10,7 @@ import com.one.societyAPI.repository.MaintenancePaymentRepository;
 import com.one.societyAPI.repository.MaintenanceRepository;
 import com.one.societyAPI.repository.SocietyRepository;
 import com.one.societyAPI.repository.UserRepository;
+import com.one.societyAPI.service.FirebaseNotificationService;
 import com.one.societyAPI.service.MaintenanceService;
 import com.one.societyAPI.utils.PaymentStatus;
 import org.springframework.stereotype.Service;
@@ -23,14 +24,16 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     private final MaintenanceRepository maintenanceRepository;
     private final MaintenancePaymentRepository maintenancePaymentRepository;
     private final UserRepository userRepository;
+    private final FirebaseNotificationService firebaseNotificationService;
 
 
     private final SocietyRepository societyRepository;
 
-    public MaintenanceServiceImpl(MaintenanceRepository maintenanceRepository, MaintenancePaymentRepository maintenancePaymentRepository, UserRepository userRepository, SocietyRepository societyRepository) {
+    public MaintenanceServiceImpl(MaintenanceRepository maintenanceRepository, MaintenancePaymentRepository maintenancePaymentRepository, UserRepository userRepository, FirebaseNotificationService firebaseNotificationService, SocietyRepository societyRepository) {
         this.maintenanceRepository = maintenanceRepository;
         this.maintenancePaymentRepository = maintenancePaymentRepository;
         this.userRepository = userRepository;
+        this.firebaseNotificationService = firebaseNotificationService;
         this.societyRepository = societyRepository;
     }
 
@@ -58,6 +61,14 @@ public class MaintenanceServiceImpl implements MaintenanceService {
             payment.setStatus(PaymentStatus.PENDING); // default
             maintenancePaymentRepository.save(payment);
         }
+
+        // 🔔 Notify all users about the new maintenance
+        firebaseNotificationService.sendNotificationToUsers(
+                users,
+                "New Maintenance Added",
+                "Maintenance has been added for your society. Please check and pay before due date."
+        );
+
 
         return mapToDTO(savedMaintenance);
     }
