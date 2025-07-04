@@ -1,9 +1,6 @@
 package com.one.societyAPI.controller;
 
-import com.one.societyAPI.dto.AdminRegisterRequest;
-import com.one.societyAPI.dto.ChangePasswordRequest;
-import com.one.societyAPI.dto.UserDTO;
-import com.one.societyAPI.dto.UserRegisterRequest;
+import com.one.societyAPI.dto.*;
 import com.one.societyAPI.entity.FcmToken;
 import com.one.societyAPI.entity.User;
 import com.one.societyAPI.exception.UserException;
@@ -78,11 +75,18 @@ public class UserController {
 
     @PostMapping("/register/superAdmin")
     @Operation(summary = "Register a Super Admin", description = "Creates a new super admin with email and password")
-    public ResponseEntity<StandardResponse<UserDTO>> registerSuperAdmin(@Valid @RequestBody User user) {
+    public ResponseEntity<StandardResponse<UserDTO>> registerSuperAdmin(@Valid @RequestBody SuperAdminRegisterRequest request) {
         String method = "registerSuperAdmin";
-        LOGGER.infoLog(CLASSNAME, method, "Request to register Super Admin: " + user);
+        LOGGER.infoLog(CLASSNAME, method, "Request to register Super Admin: " + request);
 
         try {
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setMobileNumber(request.getMobileNumber());
+            user.setName(request.getName());
+            user.setGender(request.getGender());
+
             UserDTO savedUser = userService.registerSuperAdmin(user);
             LOGGER.infoLog(CLASSNAME, method, "Super Admin registered: " + savedUser);
             return ResponseEntity.ok(StandardResponse.success("Super Admin registered", savedUser));
@@ -91,6 +95,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
+
 
     @PostMapping("/register-admin")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
