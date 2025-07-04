@@ -17,7 +17,7 @@ logging:
 
 firebase:
   config:
-    path: config/firebase/firebase-service-account.json
+    path: /config/firebase/firebase-service-account.json
 
 spring:
   servlet:
@@ -52,13 +52,13 @@ spring:
     #password: m00nSocietry
 
 
-    url: jdbc:mysql://localhost:3306/society
-    username: root
-    password: root
+    #url: jdbc:mysql://localhost:3306/society
+    #username: root
+    #password: root
 
-    #url: ${ENV_DB_URL:jdbc:mysql://13.233.142.6:3306/society}
-    #username: ${ENV_DB_USERNAME:m00nSocietry}
-    #password: ${ENV_DB_PASSWORD:m00nSocietry}
+    url: ${ENV_DB_URL:jdbc:mysql://13.233.142.6:3306/society}
+    username: ${ENV_DB_USERNAME:m00nSocietry}
+    password: ${ENV_DB_PASSWORD:m00nSocietry}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
@@ -80,7 +80,7 @@ spring:
           starttls:
             enable: true
 cors:
-  allowed-origins: "http://localhost:3000"
+  allowed-origins: "http://localhost:5173"
 
 
 springdoc:

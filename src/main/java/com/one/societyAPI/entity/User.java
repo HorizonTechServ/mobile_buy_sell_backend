@@ -78,6 +78,7 @@ public class User {
     private Flat flat;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference // 🔁 This breaks the cycle
     private List<FcmToken> fcmTokens = new ArrayList<>();
 
 }
