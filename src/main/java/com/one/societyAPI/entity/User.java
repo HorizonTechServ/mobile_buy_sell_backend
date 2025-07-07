@@ -81,4 +81,6 @@ public class User {
     @JsonBackReference // 🔁 This breaks the cycle
     private List<FcmToken> fcmTokens = new ArrayList<>();
 
+    @Column(name = "SUPER_ADMIN", columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean superAdmin = false; // default to false
 }

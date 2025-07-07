@@ -59,8 +59,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO registerSuperAdmin(User user) {
         validateUser(user);
-        return toDTO(userRepository.save(prepareUser(user, UserRole.SUPER_ADMIN)));
-    }
+        user.setRole(UserRole.SUPER_ADMIN);
+        return toDTO(userRepository.save(user));    }
 
 
     @Override
@@ -70,6 +70,8 @@ public class UserServiceImpl implements UserService {
 
         Society society = societyRepository.findById(societyId)
                 .orElseThrow(() -> new SocietyException("Society not found with id: " + societyId));
+
+        user.setSuperAdmin(false); // Ensure all users are not super admins by default
 
         user.setRole(UserRole.ADMIN);
         user.setSociety(society); // Assign society to admin
@@ -95,6 +97,8 @@ public class UserServiceImpl implements UserService {
 
         user.setFlat(flat); // Assign flat to user
         user.setSociety(society); // Assign society to user
+
+        user.setSuperAdmin(false); // Ensure all users are not super admins by default
 
         return toDTO(userRepository.save(user));
     }
@@ -274,13 +278,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserException(user.getEmail() + " Email is already taken");
         }
-    }
-
-    private User prepareUser(User user, UserRole role) {
-        user.setRole(role);
-        user.setLastLogin(LocalDateTime.now());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return user;
     }
 
     private UserDTO toDTO(User user) {
