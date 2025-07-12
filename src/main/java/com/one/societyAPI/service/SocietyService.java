@@ -1,6 +1,7 @@
 package com.one.societyAPI.service;
 
 import com.one.societyAPI.dto.CreateSocietyRequest;
+import com.one.societyAPI.dto.PatchSocietyRequest;
 import com.one.societyAPI.entity.Society;
 
 import java.util.List;
@@ -12,5 +13,5 @@ public interface SocietyService {
     Society getSocietyById(Long id);
     void deleteSociety(Long id);
     public Map<String, Object> getFlatsBySocietyId(Long societyId);
-    Society updateSociety(Long id, CreateSocietyRequest request);
+    Society patchSociety(Long id, PatchSocietyRequest request);
 }

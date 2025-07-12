@@ -1,6 +1,8 @@
 package com.one.societyAPI.service.impl;
 
 import com.one.societyAPI.dto.CreateSocietyRequest;
+import com.one.societyAPI.dto.FlatRequest;
+import com.one.societyAPI.dto.PatchSocietyRequest;
 import com.one.societyAPI.entity.Flat;
 import com.one.societyAPI.entity.Society;
 import com.one.societyAPI.exception.SocietyException;
@@ -10,10 +12,7 @@ import com.one.societyAPI.service.SocietyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,32 +85,53 @@ public class SocietyServiceImpl implements SocietyService {
     }
 
     @Override
-    public Society updateSociety(Long id, CreateSocietyRequest request) {
-        Society existingSociety = societyRepository.findById(id)
+    public Society patchSociety(Long id, PatchSocietyRequest request) {
+        Society society = societyRepository.findById(id)
                 .orElseThrow(() -> new SocietyException("Society not found with id: " + id));
 
-        existingSociety.setName(request.getName());
-        existingSociety.setAddress(request.getAddress());
-        existingSociety.setTotalFlats(request.getTotalFlats());
+        if (request.getName() != null) {
+            society.setName(request.getName());
+        }
+
+        if (request.getAddress() != null) {
+            society.setAddress(request.getAddress());
+        }
+
+        if (request.getTotalFlats() != null) {
+            society.setTotalFlats(request.getTotalFlats());
+        }
 
         if (request.getFlats() != null) {
-            List<String> existingFlatNumbers = existingSociety.getFlats().stream()
-                    .map(Flat::getFlatNumber)
-                    .toList();
+            for (FlatRequest flatReq : request.getFlats()) {
+                if (flatReq.getId() != null) {
+                    // Try to update existing flat by ID
+                    Flat existingFlat = society.getFlats().stream()
+                            .filter(f -> f.getId().equals(flatReq.getId()))
+                            .findFirst()
+                            .orElseThrow(() -> new SocietyException("Flat not found with id: " + flatReq.getId()));
 
-            for (var flatRequest : request.getFlats()) {
-                if (!existingFlatNumbers.contains(flatRequest.getFlatNumber())) {
-                    Flat flat = new Flat();
-                    flat.setFlatNumber(flatRequest.getFlatNumber());
-                    flat.setBlock(flatRequest.getBlock());
-                    flat.setOwnerName(flatRequest.getOwnerName());
-                    flat.setSociety(existingSociety);
-                    existingSociety.getFlats().add(flat);
+                    if (flatReq.getFlatNumber() != null) {
+                        existingFlat.setFlatNumber(flatReq.getFlatNumber());
+                    }
+                    if (flatReq.getBlock() != null) {
+                        existingFlat.setBlock(flatReq.getBlock());
+                    }
+                    if (flatReq.getOwnerName() != null) {
+                        existingFlat.setOwnerName(flatReq.getOwnerName());
+                    }
+                } else {
+                    // Add new flat
+                    Flat newFlat = new Flat();
+                    newFlat.setFlatNumber(flatReq.getFlatNumber());
+                    newFlat.setBlock(flatReq.getBlock());
+                    newFlat.setOwnerName(flatReq.getOwnerName());
+                    newFlat.setSociety(society);
+                    society.getFlats().add(newFlat);
                 }
             }
         }
 
-        return societyRepository.save(existingSociety);
+        return societyRepository.save(society);
     }
 
 

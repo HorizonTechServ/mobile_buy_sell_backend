@@ -1,6 +1,7 @@
 package com.one.societyAPI.controller;
 
 import com.one.societyAPI.dto.CreateSocietyRequest;
+import com.one.societyAPI.dto.PatchSocietyRequest;
 import com.one.societyAPI.entity.Society;
 import com.one.societyAPI.logger.DefaultLogger;
 import com.one.societyAPI.response.StandardResponse;
@@ -86,21 +87,13 @@ public class SocietyController {
         return ResponseEntity.ok(StandardResponse.success("Flats fetched successfully", flatMap));
     }
 
-
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @Operation(summary = "Update existing Society", description = "Update a society by its ID")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<StandardResponse<Society>> updateSociety(
+    public ResponseEntity<Society> patchSociety(
             @PathVariable Long id,
-            @RequestBody CreateSocietyRequest request) {
-        String method = "updateSociety";
-        LOGGER.infoLog(CLASSNAME, method, "Received request to update society with ID: ", id);
-
-        Society updatedSociety = societyService.updateSociety(id, request);
-
-        LOGGER.infoLog(CLASSNAME, method, "Successfully updated society with ID: ", updatedSociety.getId());
-        return ResponseEntity.ok(StandardResponse.success("Society updated successfully", updatedSociety));
+            @RequestBody PatchSocietyRequest request) {
+        Society updatedSociety = societyService.patchSociety(id, request);
+        return ResponseEntity.ok(updatedSociety);
     }
-
-
 }

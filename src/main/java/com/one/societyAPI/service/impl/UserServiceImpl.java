@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (updates.containsKey("email")) {
-            String newEmail = (String) updates.get("email");
+            String newEmail = (String   ) updates.get("email");
             if (!newEmail.equalsIgnoreCase(user.getEmail()) &&
                     userRepository.findByEmail(newEmail).isPresent()) {
                 throw new UserException(newEmail + " email is already in use");
@@ -218,6 +218,21 @@ public class UserServiceImpl implements UserService {
         if (updates.containsKey("gender")) {
             user.setGender((String) updates.get("gender"));
         }
+
+        // Add this block to update password
+        if (updates.containsKey("password")) {
+            String rawPassword = (String) updates.get("password");
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+            user.setPassword(encodedPassword);
+        }
+
+        if (updates.containsKey("societyId")) {
+            Long societyId = Long.valueOf(updates.get("societyId").toString());
+            Society society = societyRepository.findById(societyId)
+                    .orElseThrow(() -> new UserException("Society not found with id " + societyId));
+            user.setSociety(society);
+        }
+
 
         return toDTO(userRepository.save(user));
     }

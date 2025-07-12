@@ -52,13 +52,13 @@ spring:
     #password: m00nSocietry
 
 
-    url: jdbc:mysql://localhost:3306/society
-    username: root
-    password: root
+    #url: jdbc:mysql://localhost:3306/society
+    #username: root
+    #password: root
 
-    #url: ${ENV_DB_URL:jdbc:mysql://13.233.142.6:3306/society}
-    #username: ${ENV_DB_USERNAME:m00nSocietry}
-    #password: ${ENV_DB_PASSWORD:m00nSocietry}
+    url: ${ENV_DB_URL:jdbc:mysql://13.233.142.6:3306/society}
+    username: ${ENV_DB_USERNAME:m00nSocietry}
+    password: ${ENV_DB_PASSWORD:m00nSocietry}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
@@ -80,7 +80,7 @@ spring:
           starttls:
             enable: true
 cors:
-  allowed-origins: "http://localhost:5173"
+  allowed-origins: "http://localhost:5173,http://15.207.254.63"
 
 
 springdoc:
@@ -91,7 +91,7 @@ springdoc:
 
 jwt:
   secret: "c2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC1hdXRoZW50aWNhdGlvbg=="  # Replace with a strong secret key
-  expirationMs: 7200000       # Token expiration time in milliseconds (e.g., 2 hour)
+  expirationMs: 300000       # Token expiration time in milliseconds (e.g., 5 min)
   refreshExpirationMs: 604800000 # 7 days validity for refresh token (604800000)
 
 management:
