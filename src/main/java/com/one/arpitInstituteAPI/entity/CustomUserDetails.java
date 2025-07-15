@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getMobileNumber(); // Or user.getUserId() if that's your unique field
+        return user.getUsername(); // Or user.getUserId() if that's your unique field
     }
 
     @Override

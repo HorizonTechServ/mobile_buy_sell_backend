@@ -21,7 +21,4 @@ public class UserDTO {
     private UserStatus status;
     private LocalDateTime lastLogin;
     private LocalDateTime createdAt;
-    private String maintenanceStatus; // "PAID" or "PENDING"
-    private FlatRequest flat; // <- new field,
-    private Double maintenanceAmount; // <-- Include this in UserDTO
 }

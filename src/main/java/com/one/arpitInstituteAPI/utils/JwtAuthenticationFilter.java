@@ -45,23 +45,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Skip JWT authentication for permitted endpoints
         if (requestURI.startsWith("/auth") ||
-                requestURI.startsWith("/society/api/swagger-ui") ||
-                requestURI.startsWith("/society/api/v3/api-docs") ||
-                requestURI.startsWith("/society/api/swagger-ui/index.html") ||
-                requestURI.startsWith("/society/api/auth/check-user/") ||
-                requestURI.startsWith("/society/api/users/reset-password") ||
-                requestURI.equals("/society/api/error") ||
-                requestURI.equals("/society/api/auth/login") ||
+                requestURI.startsWith("/institute/api/swagger-ui") ||
+                requestURI.startsWith("/institute/api/v3/api-docs") ||
+                requestURI.startsWith("/institute/api/swagger-ui/index.html") ||
+                requestURI.startsWith("/institute/api/auth/check-user/") ||
+                requestURI.startsWith("/institute/api/users/reset-password") ||
+                requestURI.equals("/institute/api/error") ||
+                requestURI.equals("/institute/api/auth/login") ||
 
-                // New Added For Web Socket Testing
-                requestURI.startsWith("/society/api/chat-tester.html") ||
-                requestURI.startsWith("/society/api/ws-chat") ||
-                requestURI.startsWith("/society/api/ws-chat/") ||
-                requestURI.startsWith("/sockjs-node") ||
-                requestURI.startsWith("/websocket") ||
-                requestURI.contains("info") ||
-
-                requestURI.equals("/society/api/users/register/superAdmin")) {
+                requestURI.equals("/institute/api/users/register-admin")) {
             filterChain.doFilter(request, response);
             return;
         }

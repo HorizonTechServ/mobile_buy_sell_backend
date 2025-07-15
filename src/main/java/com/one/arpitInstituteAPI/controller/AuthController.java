@@ -2,15 +2,12 @@ package com.one.arpitInstituteAPI.controller;
 
 import com.one.arpitInstituteAPI.dto.LoginRequest;
 import com.one.arpitInstituteAPI.dto.RefreshTokenRequest;
-import com.one.arpitInstituteAPI.entity.FcmToken;
 import com.one.arpitInstituteAPI.entity.User;
 import com.one.arpitInstituteAPI.logger.DefaultLogger;
-import com.one.arpitInstituteAPI.repository.FcmTokenRepository;
 import com.one.arpitInstituteAPI.repository.UserRepository;
 import com.one.arpitInstituteAPI.response.StandardResponse;
 import com.one.arpitInstituteAPI.service.UserService;
 import com.one.arpitInstituteAPI.utils.JwtUtil;
-import com.one.arpitInstituteAPI.utils.UserRole;
 import com.one.arpitInstituteAPI.utils.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,14 +33,12 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-    private final FcmTokenRepository fcmTokenRepository;
 
-    public AuthController(UserService userService, UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, FcmTokenRepository fcmTokenRepository) {
+    public AuthController(UserService userService, UserRepository userRepository, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
-        this.fcmTokenRepository = fcmTokenRepository;
     }
 
     @GetMapping("/check-user/{mobileNumber}")
@@ -64,11 +59,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<StandardResponse<Map<String, Object>>> login(@Valid @RequestBody LoginRequest request) {
         String method = "login";
-        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: " + request.getMobileNumber());
+        LOGGER.infoLog(CLASSNAME, method, "Received login request for user: " + request.getUsername());
 
-        Optional<User> userOptional = userRepository.findByMobileNumber(request.getMobileNumber());
+        Optional<User> userOptional = userRepository.findUserByUsername(request.getUsername());
         if (userOptional.isEmpty()) {
-            LOGGER.warnLog(CLASSNAME, method, "Login failed - User not found: " + request.getMobileNumber());
+            LOGGER.warnLog(CLASSNAME, method, "Login failed - User not found: " + request.getUsername());
             return ResponseEntity.status(401).body(StandardResponse.error("Invalid Credentials"));
         }
 
@@ -79,71 +74,34 @@ public class AuthController {
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            LOGGER.warnLog(CLASSNAME, method, "Invalid password attempt for user: " + request.getMobileNumber());
+            LOGGER.warnLog(CLASSNAME, method, "Invalid password attempt for user: " + request.getUsername());
             return ResponseEntity.status(401).body(StandardResponse.error("Invalid Credentials"));
         }
 
-        String token = jwtUtil.generateToken(user.getMobileNumber());
+        String token = jwtUtil.generateToken(user.getUsername());
         Date expirationDate = jwtUtil.extractExpiration(token);
 
 
         // Refresh Token Code
-        String refreshToken = jwtUtil.generateRefreshToken(user.getMobileNumber());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("token", token);
         responseData.put("expires_at", expirationDate.toString());
         responseData.put("time", expirationDate.getTime());
-        responseData.put("mobileNumber", user.getMobileNumber());
+        responseData.put("username", user.getUsername());
         responseData.put("email", user.getEmail());
         responseData.put("name", user.getName());
         responseData.put("role", user.getRole().name());
-        responseData.put("superAdmin", user.isSuperAdmin());
+        responseData.put("superAdmin", user.isAdmin());
 
         // Added Refresh Token Fields
         responseData.put("refreshToken", refreshToken);
-
         responseData.put("userId", user.getId());
-        if (user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.USER) {
-            responseData.put("societyId", user.getSociety().getId());
-        }
 
-        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: " + request.getMobileNumber());
+        LOGGER.infoLog(CLASSNAME, method, "Login successful for user: " + request.getUsername());
         return ResponseEntity.ok(StandardResponse.success("Login successfully", responseData));
     }
-
-    @PostMapping("/logout")
-    @Operation(summary = "Logout user and remove FCM token")
-    public ResponseEntity<StandardResponse<String>> logout(
-            @RequestParam Long userId,
-            @RequestParam String fcmToken) {
-
-        String method = "logout";
-        LOGGER.infoLog(CLASSNAME, method, "Logout request from userId: " + userId);
-
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty()) {
-            LOGGER.warnLog(CLASSNAME, method, "User not found for ID: " + userId);
-            return ResponseEntity.status(404).body(StandardResponse.error("User not found"));
-        }
-
-        Optional<FcmToken> tokenOpt = fcmTokenRepository.findByToken(fcmToken);
-        if (tokenOpt.isPresent()) {
-            FcmToken token = tokenOpt.get();
-            if (token.getUser().getId().equals(userId)) {
-                fcmTokenRepository.delete(token);
-                LOGGER.infoLog(CLASSNAME, method, "FCM token removed successfully for userId: " + userId);
-            } else {
-                LOGGER.warnLog(CLASSNAME, method, "Token-user mismatch: token not deleted.");
-                return ResponseEntity.status(400).body(StandardResponse.error("Token doesn't belong to the user"));
-            }
-        } else {
-            LOGGER.warnLog(CLASSNAME, method, "FCM token not found for removal.");
-        }
-
-        return ResponseEntity.ok(StandardResponse.success("Logout successful and token removed", userOpt.toString()));
-    }
-
 
 
     @PostMapping("/refresh-token")

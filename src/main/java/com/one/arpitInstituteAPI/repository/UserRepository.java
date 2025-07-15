@@ -11,26 +11,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByMobileNumber(String mobileNumber);
+    Optional<User> findUserByUsername(String username);
 
     boolean existsByEmail(String email);
 
     Optional<User> findByEmail(String email);
-
-    boolean existsByMobileNumber(String contact);
-
-    // Get users by society ID and role
-    List<User> findByFlat_Society_IdAndRole(Long societyId, UserRole role);
-
-    // Get admin by society ID
-   // Optional<User> findBySociety_IdAndRole(Long societyId, UserRole role);
-
-    List<User> findBySociety_IdAndRole(Long societyId, UserRole role);
-
-
-    List<User> findByFlat_Society_Id(Long id);
-
-    List<User> findBySocietyIdAndRole(Long societyId, UserRole role);
-
-    List<User> findAllByRole(UserRole admin);
 }

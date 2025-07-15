@@ -62,26 +62,6 @@ public class GlobalExceptionHandler {
                 .body(StandardResponse.error("An unexpected error occurred: " + ex.getMessage()));
     }
 
-    @ExceptionHandler(ComplaintException.class)
-    public ResponseEntity<StandardResponse<Object>> handleComplaint(ComplaintException ex) {
-        return ResponseEntity.badRequest().body(StandardResponse.error(ex.getMessage()));
-    }
-
-    @ExceptionHandler(MaintenancePaymentException.class)
-    public ResponseEntity<StandardResponse<Object>> handleMaintenancePayment(MaintenancePaymentException ex) {
-        return ResponseEntity.badRequest().body(StandardResponse.error(ex.getMessage()));
-    }
-
-    @ExceptionHandler(MaintenanceException.class)
-    public ResponseEntity<StandardResponse<Object>> handleMaintenance(MaintenanceException ex) {
-        return ResponseEntity.badRequest().body(StandardResponse.error(ex.getMessage()));
-    }
-
-    @ExceptionHandler(FlatException.class)
-    public ResponseEntity<StandardResponse<Object>> handleFlat(FlatException ex) {
-        return ResponseEntity.badRequest().body(StandardResponse.error(ex.getMessage()));
-    }
-
     @ExceptionHandler(UserException.class)
     public ResponseEntity<StandardResponse<Object>> handleUser(UserException ex) {
         return ResponseEntity.badRequest().body(StandardResponse.error(ex.getMessage()));

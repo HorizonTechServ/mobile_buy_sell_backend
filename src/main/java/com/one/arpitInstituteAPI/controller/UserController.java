@@ -6,7 +6,6 @@ import com.one.arpitInstituteAPI.exception.UserException;
 import com.one.arpitInstituteAPI.logger.DefaultLogger;
 import com.one.arpitInstituteAPI.repository.UserRepository;
 import com.one.arpitInstituteAPI.response.StandardResponse;
-import com.one.arpitInstituteAPI.service.FcmTokenService;
 import com.one.arpitInstituteAPI.service.OtpService;
 import com.one.arpitInstituteAPI.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,67 +50,21 @@ public class UserController {
     private OtpService otpService;
 
     @Autowired
-    private FcmTokenService fcmTokenService;
-
-    @Autowired
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
 
-    @PostMapping("/update-fcm-token")
-    @Operation(summary = "Update FCM token of user", description = "Registers the FCM token to the user")
-    public ResponseEntity<String> updateFcmToken(
-            @RequestParam Long userId,
-            @RequestParam String fcmToken
-    ) {
-        fcmTokenService.registerFcmToken(userId, fcmToken);
-        return ResponseEntity.ok("FCM token registered successfully.");
-    }
-
-    @PostMapping("/register/superAdmin")
-    @Operation(summary = "Register a Super Admin", description = "Creates a new super admin with email and password")
-    public ResponseEntity<StandardResponse<UserDTO>> registerSuperAdmin(@Valid @RequestBody SuperAdminRegisterRequest request) {
-        String method = "registerSuperAdmin";
-        LOGGER.infoLog(CLASSNAME, method, "Request to register Super Admin: " + request);
-
-        try {
-            User user = new User();
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setMobileNumber(request.getMobileNumber());
-            user.setName(request.getName());
-            user.setGender(request.getGender());
-
-            UserDTO savedUser = userService.registerSuperAdmin(user);
-            LOGGER.infoLog(CLASSNAME, method, "Super Admin registered: " + savedUser);
-            return ResponseEntity.ok(StandardResponse.success("Super Admin registered", savedUser));
-        } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to register Super Admin: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
-        }
-    }
-
-
     @PostMapping("/register-admin")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Register an Admin", description = "Creates a new admin")
-    public ResponseEntity<StandardResponse<UserDTO>> registerAdmin(@Valid @RequestBody AdminRegisterRequest request) {
+    public ResponseEntity<StandardResponse<UserDTO>> registerAdmin(@Valid @RequestBody RegisterRequest request) {
         String method = "registerAdmin";
         LOGGER.infoLog(CLASSNAME, method, "Request to register Admin: " + request);
 
         try {
-            User user = new User();
-            user.setName(request.getName());
-            user.setEmail(request.getEmail());
-            user.setMobileNumber(request.getMobileNumber());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRole(request.getRole());
-            user.setGender(request.getGender());
-            user.setLastLogin(LocalDateTime.now());
-
-            UserDTO savedAdmin = userService.registerAdmin(user, request.getSocietyId());
+            User userAdmin = registerUsers(request);
+            UserDTO savedAdmin = userService.registerAdmin(userAdmin);
             LOGGER.infoLog(CLASSNAME, method, "Admin registered: " + savedAdmin);
             return ResponseEntity.ok(StandardResponse.success("Admin registered", savedAdmin));
         } catch (UserException e) {
@@ -121,66 +73,28 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register/user")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Register a User", description = "Creates a new user")
-    public ResponseEntity<StandardResponse<UserDTO>> registerUser(@Valid @RequestBody UserRegisterRequest request) {
-        String method = "registerUser";
-        LOGGER.infoLog(CLASSNAME, method, "Request to register User: " + request);
+    @PostMapping("/register-student")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @Operation(summary = "Register an Student", description = "Creates a new student")
+    public ResponseEntity<StandardResponse<UserDTO>> registerStudent(@Valid @RequestBody RegisterRequest request) {
+        String method = "registerStudent";
+
+        LOGGER.infoLog(CLASSNAME, method, "Request to register Student: " + request);
 
         try {
-            User user = new User();
-            user.setName(request.getName());
-            user.setEmail(request.getEmail());
-            user.setMobileNumber(request.getMobileNumber());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRole(request.getRole());
-            user.setGender(request.getGender());
-            user.setLastLogin(LocalDateTime.now());
-
-            //UserDTO savedUser = userService.registerUser(user, request.getFlatId());
-            UserDTO savedUser = userService.registerUser(user, request.getFlatId(), request.getSocietyId());
-
-            LOGGER.infoLog(CLASSNAME, method, "User registered: " + savedUser);
-            return ResponseEntity.ok(StandardResponse.success("User registered", savedUser));
+            User user = registerUsers(request);
+            UserDTO savedUser = userService.registerStudent(user);
+            LOGGER.infoLog(CLASSNAME, method, "Student registered: " + savedUser);
+            return ResponseEntity.ok(StandardResponse.success("Student registered", savedUser));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to register User: " + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to register Student: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
 
-    @GetMapping("/by-society/{societyId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Get Users by Society ID", description = "Fetch all users in a specific society")
-    public ResponseEntity<StandardResponse<?>> getUsersBySociety(@PathVariable Long societyId) {
-        String method = "getUsersBySociety";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching users for societyId: ", societyId);
-        try {
-            return ResponseEntity.ok(StandardResponse.success("Users fetched", userService.getUsersBySocietyId(societyId)));
-        } catch (Exception e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error("Error fetching users"));
-        }
-    }
-
-
-    @GetMapping("/admin/by-society/{societyId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
-    @Operation(summary = "Get Admins by Society ID", description = "Fetch all admins assigned to a specific society")
-    public ResponseEntity<StandardResponse<?>> getAdminsBySociety(@PathVariable Long societyId) {
-        String method = "getAdminsBySociety";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching admins for societyId: ", societyId);
-        try {
-            List<UserDTO> admins = userService.getAdminsBySocietyId(societyId);
-            return ResponseEntity.ok(StandardResponse.success("Admins fetched", admins));
-        } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch admins: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
-        }
-    }
 
     @DeleteMapping("/delete/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
     @Operation(summary = "Delete a User", description = "Allows an Admin or Super Admin to delete a user by ID using soft delete")
     public ResponseEntity<StandardResponse<String>> deleteUser(@PathVariable Long userId) {
         String method = "deleteUser";
@@ -194,23 +108,9 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getAllUser/by-society/{societyId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Get All Users by Society ID (Role = USER)", description = "Fetch users with role USER for a specific society")
-    public ResponseEntity<StandardResponse<?>> getUsersBySocietyAndRoleUser(@PathVariable Long societyId) {
-        String method = "getUsersBySocietyAndRoleUser";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching users with role USER for societyId: ", societyId);
-        try {
-            return ResponseEntity.ok(StandardResponse.success("Users fetched", userService.getUsersBySocietyIdAndRoleUser(societyId)));
-        } catch (Exception e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to fetch users: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error("Error fetching users with role USER"));
-        }
-    }
-
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
     @Operation(summary = "Get user by userId", description = "Fetch a single user by ID without exposing password")
     public ResponseEntity<StandardResponse<UserDTO>> getUserById(@PathVariable Long userId) {
         String method = "getUserById";
@@ -226,51 +126,34 @@ public class UserController {
         }
     }
 
-    @PutMapping("/edit/{userId}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Edit User Details", description = "Update user name, mobile number, or flat number")
-    public ResponseEntity<StandardResponse<UserDTO>> editUserDetails(
+    @PutMapping("/edit-student/{userId}")
+    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
+    @Operation(summary = "Edit User Details", description = "Update user name, mobile number")
+    public ResponseEntity<StandardResponse<UserDTO>> editStudentDetails(
             @PathVariable Long userId,
             @RequestBody Map<String, Object> updates) {
-        String method = "editUserDetails";
+        String method = "editStudentDetails";
         LOGGER.infoLog(CLASSNAME, method, "Updating userId  with: ", userId);
         try {
-            UserDTO updatedUser = userService.editUser(userId, updates);
-            return ResponseEntity.ok(StandardResponse.success("User updated", updatedUser));
+            UserDTO updatedStudent = userService.editStudent(userId, updates);
+            return ResponseEntity.ok(StandardResponse.success("User updated", updatedStudent));
         } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to update user: " + e.getMessage());
+            LOGGER.errorLog(CLASSNAME, method, "Failed to update Student: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
 
-    @PutMapping("/superAdmin/edit/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Edit Super Admin Details", description = "Update Super Admin name and mobile number")
-    public ResponseEntity<StandardResponse<UserDTO>> editSuperAdminDetails(
-            @PathVariable Long userId,
-            @RequestBody Map<String, Object> updates) {
-        String method = "editSuperAdminDetails";
-        LOGGER.infoLog(CLASSNAME, method, "Updating Super Admin userId  with: ", userId);
-        try {
-            UserDTO updatedUser = userService.editUser(userId, updates);
-            return ResponseEntity.ok(StandardResponse.success("Super Admin updated", updatedUser));
-        } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to update Super Admin: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
-        }
-    }
-
-    @PutMapping("/admin/edit/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Edit Admin Details", description = "Update Admin name and mobile number")
+    @PutMapping("/edit-admin/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Edit Admin Details", description = "Update Admin name, mobile number")
     public ResponseEntity<StandardResponse<UserDTO>> editAdminDetails(
             @PathVariable Long userId,
             @RequestBody Map<String, Object> updates) {
         String method = "editAdminDetails";
-        LOGGER.infoLog(CLASSNAME, method, "Updating Admin userId  with: " ,  userId);
+        LOGGER.infoLog(CLASSNAME, method, "Updating userId  with: ", userId);
         try {
-            UserDTO updatedUser = userService.editUser(userId, updates);
-            return ResponseEntity.ok(StandardResponse.success("Admin updated", updatedUser));
+            UserDTO updatedAdmin = userService.editAdmin(userId, updates);
+            return ResponseEntity.ok(StandardResponse.success("Admin updated", updatedAdmin));
         } catch (UserException e) {
             LOGGER.errorLog(CLASSNAME, method, "Failed to update Admin: " + e.getMessage());
             return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
@@ -316,7 +199,7 @@ public class UserController {
 
         User user = userOpt.get();
 
-        String mobileNumber = user.getMobileNumber();
+        String mobileNumber = user.getUsername();
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
@@ -333,10 +216,10 @@ public class UserController {
 
         try {
             // Get mobile number of currently logged-in user
-            String mobileNumber = SecurityContextHolder.getContext().getAuthentication().getName();
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
             // Fetch user from database
-            Optional<User> optionalUser = userRepository.findByMobileNumber(mobileNumber);
+            Optional<User> optionalUser = userRepository.findUserByUsername(username);
             if (optionalUser.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(StandardResponse.error("User not found"));
@@ -376,27 +259,8 @@ public class UserController {
     }
 
 
-    @PostMapping("/reminder/send-maintenance-reminder/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @Operation(summary = "Send maintenance reminder email to a user")
-    public ResponseEntity<StandardResponse<?>> sendMaintenanceReminder(@PathVariable Long userId) {
-        String method = "sendMaintenanceReminder";
-        LOGGER.infoLog(CLASSNAME, method, "Sending reminder to userId: ", userId);
-        try {
-            userService.sendMaintenanceReminderIfPending(userId);
-            return ResponseEntity.ok(StandardResponse.success("Reminder sent successfully", null));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
-        } catch (Exception e) {
-            LOGGER.errorLog(CLASSNAME, method, "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(StandardResponse.error("Failed to send reminder"));
-        }
-    }
-
-
     @PutMapping(value = "/upload-profile-picture/{userId}", consumes = "multipart/form-data")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
     @Operation(summary = "Upload/Update Profile Picture", description = "Upload or update user's profile picture after registration")
     public ResponseEntity<StandardResponse<String>> uploadProfilePicture(
             @PathVariable Long userId,
@@ -416,7 +280,7 @@ public class UserController {
     }
 
     @GetMapping("/profile-picture/{userId}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN','SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
     @Operation(summary = "Get User Profile Picture", description = "Fetch user's profile picture or error")
     public ResponseEntity<?> getUserProfilePicture(@PathVariable Long userId) {
         Optional<User> userOpt = userRepository.findById(userId);
@@ -443,5 +307,19 @@ public class UserController {
         headers.setContentType(MediaType.parseMediaType(contentType));
 
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
+
+
+    private User registerUsers(@RequestBody @Valid RegisterRequest request) {
+        User userAdmin = new User();
+        userAdmin.setName(request.getName());
+        userAdmin.setEmail(request.getEmail());
+        userAdmin.setUsername(request.getUsername());
+        userAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
+        userAdmin.setRole(request.getRole());
+        userAdmin.setGender(request.getGender());
+        userAdmin.setLastLogin(LocalDateTime.now());
+
+        return userAdmin;
     }
 }

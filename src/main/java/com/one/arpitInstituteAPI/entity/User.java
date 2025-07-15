@@ -1,6 +1,5 @@
 package com.one.arpitInstituteAPI.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.one.arpitInstituteAPI.utils.UserRole;
 import com.one.arpitInstituteAPI.utils.UserStatus;
 import jakarta.persistence.*;
@@ -13,8 +12,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,10 +28,9 @@ public class User {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @Pattern(regexp = "\\d{10}", message = "Mobile Number must be 10 digits")
     @NotBlank(message = "Mobile Number is required")
     @Column(unique = true, nullable = false)
-    private String mobileNumber;
+    private String username;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
@@ -43,7 +39,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole role = UserRole.SUPER_ADMIN;
+    private UserRole role = UserRole.ADMIN;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -66,20 +62,6 @@ public class User {
     @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
     private byte[] profilePicture;
 
-    @ManyToOne
-    @JoinColumn(name = "society_id")
-    @JsonBackReference // 🔁 Avoid circular reference with Society
-    private Society society; // Nullable for super admin
-
-    @OneToOne
-    @JoinColumn(name = "flat_id", unique = true)
-    @JsonBackReference // 🔁 This breaks the cycle
-    private Flat flat;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference // 🔁 This breaks the cycle
-    private List<FcmToken> fcmTokens = new ArrayList<>();
-
-    @Column(name = "SUPER_ADMIN", columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean superAdmin = false; // default to false
+    @Column(name = "ADMIN", columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean admin = false; // default to false
 }

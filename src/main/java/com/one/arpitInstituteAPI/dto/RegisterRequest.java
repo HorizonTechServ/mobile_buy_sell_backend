@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminRegisterRequest {
+public class RegisterRequest {
 
     private Long id;
     private String name;
     private String email;
     private String password;
-    private String mobileNumber;
+    private String username;
     private String gender;
     private UserRole role;
     private UserStatus status;

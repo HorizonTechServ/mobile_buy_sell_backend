@@ -12,23 +12,15 @@ public interface UserService {
 
     boolean isUserIdUnique(String mobileNumber);
 
-    UserDTO registerSuperAdmin(User user);
+    public UserDTO registerAdmin(User user);
 
-    public UserDTO registerAdmin(User user, Long societyId);
+    public UserDTO registerStudent(User user);
 
-    public UserDTO registerUser(User user, Long flatId, Long societyId);
+    UserDTO editAdmin(Long userId, Map<String, Object> updates);
 
-    List<UserDTO> getUsersBySocietyId(Long societyId);
-
-    public List<UserDTO> getAdminsBySocietyId(Long societyId);
-
-    UserDTO editUser(Long userId, Map<String, Object> updates);
+    UserDTO editStudent(Long userId, Map<String, Object> updates);
 
     void softDeleteUserById(Long userId);
-
-    List<UserDTO> getUsersBySocietyIdAndRoleUser(Long societyId);
-
-    public void sendMaintenanceReminderIfPending(Long userId);
 
     UserDTO getUserDetailsById(Long userId);
 
