@@ -1,66 +1,88 @@
-# Society Management API
+# 🎓 Arpit Institute Backend API
 
-This is a RESTful API for a **Society Management System**, designed to streamline residential society operations. The system supports role-based access for **Super Admin**, **Admin**, and **User** and includes modules for user management, property (flat/house) handling, and complaint tracking.
+This is a RESTful API for **Arpit Institute**, designed to manage students, receipts, and administrative operations efficiently. The backend provides secure, role-based access and handles student registration, fee collection, receipt generation, and user management.
 
 ---
 
 ## 🚀 Tech Stack
 
-- Java  
-- Spring Boot  
-- Spring Security  
-- Spring Data JPA  
-- Hibernate  
-- MySQL  
-- JWT (for Authentication)  
-- Gradle  
+* Java 17+
+* Spring Boot
+* Spring Security
+* Spring Data JPA
+* Hibernate
+* MySQL
+* JWT (Authentication & Authorization)
+* Gradle
+* Swagger for API Documentation
 
 ---
 
 ## 🧩 Modules
 
-- **Authentication Module** (JWT-based login/logout)
-- **User Management Module** (Super Admin, Admin, and User operations)
-- **Property Module** (Flat and House management)
-- **Complaint Module** (User complaints against society issues)
+### 🧑‍🏫 User Management
+
+* Register Admin, and Students
+* Update user details and profile picture
+* Reset/change password using OTP
+* Role-based access controls
+
+### 💵 Receipt/Billing Module
+
+* Generate and store tuition receipts
+* Calculate fees and total dynamically
+* Convert amount to words
+* Attach cheque/payment details
+* Retrieve receipt by ID
+* List all receipts
+
+### 📦 Authentication
+
+* JWT-based login/logout
+* Token validation
+* Secure password encryption (BCrypt)
 
 ---
 
 ## 🔐 Role-Based Access
 
-### 🟣 Super Admin
-- Can create and manage Admin accounts
-- Full system access and oversight
-
-### 🔵 Admin
-- Can register and manage Users
-- Can add/edit/delete Flats and Houses
-
-### 🟢 User
-- Can log in and view assigned property details
-- Can raise complaints related to society issues
+| Role           | Capabilities                                          |
+| -------------- | ----------------------------------------------------- |
+| 🔵 Admin       | Register/edit students, manage receipts               |
+| 🔹 Student     | View profile, update password, upload profile image   |
 
 ---
 
-## 🎯 Features
+## 🎯 Key Features
 
-- Secure **JWT-based authentication** and authorization
-- Clean role-based access control
-- CRUD operations for Flats, Houses, Users, and Complaints
-- Admins and Super Admins can manage user hierarchies
-- Users can submit and track society complaints
+* ✅ Secure JWT authentication & role-based authorization
+* ✅ Admins can register/update students
+* ✅ Students can view and update profile
+* ✅ Dynamic fee receipt generation
+* ✅ Fee breakup with amount-to-words converter
+* ✅ Soft delete support for users
 
 ---
 
 ## ⚙️ Installation & Run
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/HorizonTechServ/society-mate-backend.git
-   cd society-mate-backend
+```bash
+# Clone the repository
+git clone https://github.com/HorizonTechServ/arpit-institute-backend.git
+cd arpit-institute-backend
 
-## ⚙️ Swagger URL
+# Run using Gradle
+./gradlew bootRun
+```
 
-http://localhost:9090/society/api/swagger-ui/index.html#
+Ensure `MySQL` is running and the database is configured in `application.yml`.
 
+---
 
+## 📄 Swagger API Docs
+
+Access all API documentation via Swagger UI:
+
+📌 (http://localhost:9191/institute/api/swagger-ui/index.html#/)
+
+---
