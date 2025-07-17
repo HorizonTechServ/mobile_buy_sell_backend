@@ -93,7 +93,7 @@ public class AuthController {
         responseData.put("email", user.getEmail());
         responseData.put("name", user.getName());
         responseData.put("role", user.getRole().name());
-        responseData.put("superAdmin", user.isAdmin());
+        responseData.put("admin", user.isAdmin());
 
         // Added Refresh Token Fields
         responseData.put("refreshToken", refreshToken);

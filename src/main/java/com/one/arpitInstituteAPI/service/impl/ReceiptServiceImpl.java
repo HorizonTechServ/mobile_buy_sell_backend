@@ -2,31 +2,75 @@ package com.one.arpitInstituteAPI.service.impl;
 
 import com.one.arpitInstituteAPI.dto.ReceiptRequest;
 import com.one.arpitInstituteAPI.entity.Receipt;
+import com.one.arpitInstituteAPI.entity.ReceiptConfig;
+import com.one.arpitInstituteAPI.entity.Student;
+import com.one.arpitInstituteAPI.exception.DuplicateFeePaymentException;
+import com.one.arpitInstituteAPI.repository.ReceiptConfigRepository;
 import com.one.arpitInstituteAPI.repository.ReceiptRepository;
+import com.one.arpitInstituteAPI.repository.StudentRepository;
 import com.one.arpitInstituteAPI.service.ReceiptService;
 import com.one.arpitInstituteAPI.utils.MoneyToWordsConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReceiptServiceImpl implements ReceiptService {
 
     private final ReceiptRepository receiptRepository;
 
+    private final ReceiptConfigRepository receiptConfigRepository;
+
+    private final StudentRepository studentRepository;
+
     @Autowired
-    public ReceiptServiceImpl(ReceiptRepository receiptRepository) {
+    public ReceiptServiceImpl(ReceiptRepository receiptRepository, ReceiptConfigRepository receiptConfigRepository, StudentRepository studentRepository) {
         this.receiptRepository = receiptRepository;
+        this.receiptConfigRepository = receiptConfigRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
     public Receipt createReceipt(ReceiptRequest request, String createdBy) {
+
+        // Check for existing payment
+        Optional<Receipt> existingReceipt = receiptRepository.findByStudentNameAndSemesterAndDepartment(
+                request.getStudentName(),
+                request.getSemester(),
+                request.getDepartment()
+        );
+
+
+        if (existingReceipt.isPresent()) {
+            throw new DuplicateFeePaymentException(
+                    request.getStudentName() + " has already paid the fees for Semester " + request.getSemester()
+            );
+        }
+
+
+        // ✅ Save student if not already present
+        studentRepository.findByStudentName(request.getStudentName())
+                .orElseGet(() -> {
+                    Student student = new Student();
+                    student.setStudentName(request.getStudentName());
+                    student.setStudentMobileNumber(request.getStudentMobileNumber());
+                    student.setStudentEmail(request.getStudentEmail());
+                    return studentRepository.save(student);
+                });
+
+
+        // Proceed to save new receipt
         Receipt receipt = new Receipt();
-        receipt.setReceiptNo(request.getReceiptNo());
+        receipt.setReceiptNo(generateNextReceiptNo());
         receipt.setYear(request.getYear());
         receipt.setDate(request.getDate());
         receipt.setStudentName(request.getStudentName());
+        receipt.setStudentMobileNumber(request.getStudentMobileNumber());
+        receipt.setStudentEmail(request.getStudentEmail());
+
         receipt.setDepartment(request.getDepartment());
         receipt.setBranch(request.getBranch());
         receipt.setSemester(request.getSemester());
@@ -50,5 +94,31 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setCreatedAt(LocalDateTime.now());
 
         return receiptRepository.save(receipt);
+    }
+
+
+
+    private String generateNextReceiptNo() {
+        String prefix = "REC"; // default fallback prefix
+
+        // Fetch prefix from config (use latest or only one record)
+        List<ReceiptConfig> configs = receiptConfigRepository.findAll();
+        if (!configs.isEmpty() && configs.get(0).getReceiptPrefix() != null) {
+            prefix = configs.get(0).getReceiptPrefix();
+        }
+
+        String lastReceiptNo = receiptRepository.findLastReceiptNo(); // e.g. "INS-000123"
+        long nextNumber = 1; // default for first record
+
+        if (lastReceiptNo != null && lastReceiptNo.startsWith(prefix + "-")) {
+            try {
+                String numberPart = lastReceiptNo.substring((prefix + "-").length());
+                nextNumber = Long.parseLong(numberPart) + 1;
+            } catch (NumberFormatException e) {
+                nextNumber = receiptRepository.count() + 1;
+            }
+        }
+
+        return String.format("%s-%06d", prefix, nextNumber);
     }
 }

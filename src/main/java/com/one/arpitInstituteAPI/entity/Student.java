@@ -1,0 +1,23 @@
+package com.one.arpitInstituteAPI.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String studentName;
+
+    private String studentMobileNumber;
+
+    private String studentEmail;
+}

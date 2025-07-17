@@ -28,7 +28,7 @@ public class User {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @NotBlank(message = "Mobile Number is required")
+    @NotBlank(message = "Username Number is required")
     @Column(unique = true, nullable = false)
     private String username;
 

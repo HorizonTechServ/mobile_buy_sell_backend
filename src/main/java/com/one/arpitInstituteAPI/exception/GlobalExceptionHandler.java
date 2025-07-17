@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -49,6 +50,12 @@ public class GlobalExceptionHandler {
                 .body(StandardResponse.error("Uploaded file exceeds the maximum allowed size of 10MB"));
     }
 
+    @ExceptionHandler(DuplicateFeePaymentException.class)
+    public ResponseEntity<StandardResponse<Object>> handleDuplicateFeePayment(DuplicateFeePaymentException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(StandardResponse.error(ex.getMessage()));
+    }
+
     // Any runtime exception
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<StandardResponse<Void>> handleRuntimeException(RuntimeException ex) {
@@ -65,5 +72,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserException.class)
     public ResponseEntity<StandardResponse<Object>> handleUser(UserException ex) {
         return ResponseEntity.badRequest().body(StandardResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<StandardResponse<Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String rootCause = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
+
+        if (rootCause != null && rootCause.contains("Duplicate entry") && rootCause.contains("receipt")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(StandardResponse.error("Receipt number already exists. Please use a unique receipt number."));
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(StandardResponse.error("Data integrity violation: " + ex.getMessage()));
     }
 }

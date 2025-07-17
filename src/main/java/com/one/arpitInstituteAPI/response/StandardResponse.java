@@ -21,6 +21,7 @@ public class StandardResponse<T> {
         return new StandardResponse<>(false, message, null);
     }
 
+
     // ✅ Add this overload to support (message, data)
     public static <T> StandardResponse<T> error(String message, T data) {
         return new StandardResponse<>(false, message, data);
