@@ -1,5 +1,6 @@
 package com.one.arpitInstituteAPI.controller;
 
+import com.one.arpitInstituteAPI.dto.StudentNameDTO;
 import com.one.arpitInstituteAPI.entity.Student;
 import com.one.arpitInstituteAPI.repository.StudentRepository;
 import com.one.arpitInstituteAPI.response.StandardResponse;
@@ -22,5 +23,12 @@ public class StudentController {
     public ResponseEntity<StandardResponse<List<Student>>> getAllStudents() {
         List<Student> students = studentRepository.findAll();
         return ResponseEntity.ok(StandardResponse.success("Student list fetched successfully", students));
+    }
+
+    @GetMapping("/names")
+    @Operation(summary = "Get all student names", description = "Fetches only student names")
+    public ResponseEntity<StandardResponse<List<StudentNameDTO>>> getAllStudentNames() {
+        List<StudentNameDTO> names = studentRepository.findAllStudentNames();
+        return ResponseEntity.ok(StandardResponse.success("Student names fetched successfully", names));
     }
 }
