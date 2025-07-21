@@ -28,6 +28,19 @@ public class SemesterServiceImpl implements SemesterService {
     }
 
     @Override
+    public Semester getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Semester not found with ID: " + id));
+    }
+
+    @Override
+    public Semester update(Long id, Semester updated) {
+        Semester existing = getById(id);
+        existing.setName(updated.getName());
+        return repository.save(existing);
+    }
+
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
     }

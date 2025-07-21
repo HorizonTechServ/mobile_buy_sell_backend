@@ -47,6 +47,24 @@ class BranchController {
         return ResponseEntity.ok(StandardResponse.success("Branches fetched", list));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get Branch by ID")
+    public ResponseEntity<StandardResponse<Branch>> getById(@PathVariable Long id) {
+        String method = "getById";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching branch by ID: " + id);
+        Branch  branch = branchService.getById(id);
+        return ResponseEntity.ok(StandardResponse.success("Branch fetched", branch));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update branch by ID")
+    public ResponseEntity<StandardResponse<Branch>> update(@PathVariable Long id, @RequestBody Branch updatedBranch) {
+        String method = "update";
+        LOGGER.infoLog(CLASSNAME, method, "Updating branch with ID: " + id);
+        Branch updated = branchService.update(id, updatedBranch);
+        return ResponseEntity.ok(StandardResponse.success("Branch updated", updated));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete branch by ID")
     public ResponseEntity<StandardResponse<Void>> delete(@PathVariable Long id) {

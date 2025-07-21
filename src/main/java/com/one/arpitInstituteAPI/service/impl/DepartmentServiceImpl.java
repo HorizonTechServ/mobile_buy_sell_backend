@@ -28,6 +28,19 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    public Department getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Department not found with ID: " + id));
+    }
+
+    @Override
+    public Department update(Long id, Department updated) {
+        Department existing = getById(id);
+        existing.setName(updated.getName());
+        return repository.save(existing);
+    }
+
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
     }

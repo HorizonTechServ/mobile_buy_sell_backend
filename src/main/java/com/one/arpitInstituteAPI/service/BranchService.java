@@ -8,4 +8,6 @@ public interface BranchService {
     Branch create(Branch branch);
     List<Branch> getAll();
     void delete(Long id);
+    Branch getById(Long id);
+    Branch update(Long id, Branch updated);
 }

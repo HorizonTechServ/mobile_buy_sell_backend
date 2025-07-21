@@ -1,5 +1,6 @@
 package com.one.arpitInstituteAPI.controller;
 
+import com.one.arpitInstituteAPI.entity.Department;
 import com.one.arpitInstituteAPI.entity.Semester;
 import com.one.arpitInstituteAPI.logger.DefaultLogger;
 import com.one.arpitInstituteAPI.response.StandardResponse;
@@ -46,6 +47,25 @@ public class SemesterController {
         List<Semester> list = semesterService.getAll();
         return ResponseEntity.ok(StandardResponse.success("Semesters fetched", list));
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get Semester by ID")
+    public ResponseEntity<StandardResponse<Semester>> getById(@PathVariable Long id) {
+        String method = "getById";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching Semester by ID: " + id);
+        Semester semester = semesterService.getById(id);
+        return ResponseEntity.ok(StandardResponse.success("Semester fetched", semester));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update Semester by ID")
+    public ResponseEntity<StandardResponse<Semester>> update(@PathVariable Long id, @RequestBody Semester updatedSem) {
+        String method = "update";
+        LOGGER.infoLog(CLASSNAME, method, "Updating Semester with ID: " + id);
+        Semester updated = semesterService.update(id, updatedSem);
+        return ResponseEntity.ok(StandardResponse.success("Semester updated", updated));
+    }
+
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete semester by ID")

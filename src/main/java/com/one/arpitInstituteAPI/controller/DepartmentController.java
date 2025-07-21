@@ -47,6 +47,24 @@ public class DepartmentController {
         return ResponseEntity.ok(StandardResponse.success("Departments fetched", list));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get department by ID")
+    public ResponseEntity<StandardResponse<Department>> getById(@PathVariable Long id) {
+        String method = "getById";
+        LOGGER.infoLog(CLASSNAME, method, "Fetching department by ID: " + id);
+        Department department = departmentService.getById(id);
+        return ResponseEntity.ok(StandardResponse.success("Department fetched", department));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update department by ID")
+    public ResponseEntity<StandardResponse<Department>> update(@PathVariable Long id, @RequestBody Department updatedDept) {
+        String method = "update";
+        LOGGER.infoLog(CLASSNAME, method, "Updating department with ID: " + id);
+        Department updated = departmentService.update(id, updatedDept);
+        return ResponseEntity.ok(StandardResponse.success("Department updated", updated));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete department by ID")
     public ResponseEntity<StandardResponse<Void>> delete(@PathVariable Long id) {

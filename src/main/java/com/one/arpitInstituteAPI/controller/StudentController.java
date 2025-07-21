@@ -5,6 +5,7 @@ import com.one.arpitInstituteAPI.entity.Student;
 import com.one.arpitInstituteAPI.repository.StudentRepository;
 import com.one.arpitInstituteAPI.response.StandardResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/students")
 @RequiredArgsConstructor
+@Tag(name = "Student Management", description = "APIs for managing student")
 public class StudentController {
 
     private final StudentRepository studentRepository;

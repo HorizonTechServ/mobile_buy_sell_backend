@@ -28,6 +28,19 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    public Branch getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Branch not found with ID: " + id));
+    }
+
+    @Override
+    public Branch update(Long id, Branch updated) {
+        Branch existing = getById(id);
+        existing.setName(updated.getName());
+        return repository.save(existing);
+    }
+
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
     }
