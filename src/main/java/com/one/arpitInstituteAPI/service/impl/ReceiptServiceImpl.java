@@ -99,13 +99,13 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 
     private String generateNextReceiptNo() {
-        String prefix = "REC"; // default fallback prefix
+        String prefix = "RECX"; // default fallback prefix
 
         // Fetch prefix from config (use latest or only one record)
         List<ReceiptConfig> configs = receiptConfigRepository.findAll();
         if (!configs.isEmpty() && configs.get(0).getReceiptPrefix() != null) {
             prefix = configs.get(0).getReceiptPrefix();
-        }
+            }
 
         String lastReceiptNo = receiptRepository.findLastReceiptNo(); // e.g. "INS-000123"
         long nextNumber = 1; // default for first record

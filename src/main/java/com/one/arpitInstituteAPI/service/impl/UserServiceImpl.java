@@ -68,8 +68,8 @@ public class UserServiceImpl implements UserService {
 
         return new UserDTO(
                 user.getId(),
-                user.getName(),
                 user.getEmail(),
+                user.getMobileNumber(),
                 user.getUsername(),
                 user.getGender(),
                 user.getRole(),
@@ -103,8 +103,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException("User not found with user id: " + userId));
 
-        if (updates.containsKey("name")) {
-            user.setName((String) updates.get("name"));
+        if (updates.containsKey("mobileNumber")) {
+            user.setMobileNumber((String) updates.get("mobileNumber"));
         }
 
         if (updates.containsKey("username")) {
@@ -146,10 +146,6 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException("Student not found with user id: " + userId));
-
-        if (updates.containsKey("name")) {
-            user.setName((String) updates.get("name"));
-        }
 
         if (updates.containsKey("username")) {
             String newUsername = (String) updates.get("username");
@@ -205,8 +201,8 @@ public class UserServiceImpl implements UserService {
 
         return new UserDTO(
                 user.getId(),
-                user.getName(),
                 user.getEmail(),
+                user.getMobileNumber(),
                 user.getUsername(),
                 user.getGender(),
                 user.getRole(),

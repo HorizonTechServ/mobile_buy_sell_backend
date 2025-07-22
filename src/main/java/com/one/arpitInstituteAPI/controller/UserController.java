@@ -312,9 +312,9 @@ public class UserController {
 
     private User registerUsers(@RequestBody @Valid RegisterRequest request) {
         User userAdmin = new User();
-        userAdmin.setName(request.getName());
         userAdmin.setEmail(request.getEmail());
         userAdmin.setUsername(request.getUsername());
+        userAdmin.setMobileNumber(request.getMobileNumber());
         userAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
         userAdmin.setRole(request.getRole());
         userAdmin.setGender(request.getGender());

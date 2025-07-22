@@ -53,9 +53,9 @@ spring:
     username: root
     password: root
 
-    #url: ${ENV_DB_URL:jdbc:mysql://13.233.142.6:3306/institute}
-    #username: ${ENV_DB_USERNAME:institute}
-    #password: ${ENV_DB_PASSWORD:institute}
+    #url: ${ENV_DB_URL:jdbc:mysql://216.48.180.92:3306/institute}
+    #username: ${ENV_DB_USERNAME:root}
+    #password: ${ENV_DB_PASSWORD:diameterserver@2024@db}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
@@ -88,7 +88,7 @@ springdoc:
 
 jwt:
   secret: "c2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC1hdXRoZW50aWNhdGlvbg=="  # Replace with a strong secret key
-  expirationMs: 7200000       # Token expiration time in milliseconds (e.g., 2 hour)
+  expirationMs: 180000       # Token expiration time in milliseconds (e.g., 3 min)
   refreshExpirationMs: 604800000 # 7 days validity for refresh token (604800000)
 
 management:

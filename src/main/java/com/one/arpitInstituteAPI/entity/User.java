@@ -32,6 +32,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @NotBlank(message = "Mobile Number is required")
+    private String mobileNumber;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     @Column(unique = true, nullable = false)
@@ -44,8 +47,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
-
-    private String name;
 
     private String gender;
 

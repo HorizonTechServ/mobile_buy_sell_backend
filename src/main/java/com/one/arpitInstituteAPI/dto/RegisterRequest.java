@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 public class RegisterRequest {
 
     private Long id;
-    private String name;
     private String email;
     private String password;
     private String username;
+    private String mobileNumber;
     private String gender;
     private UserRole role;
     private UserStatus status;

@@ -91,7 +91,6 @@ public class AuthController {
         responseData.put("time", expirationDate.getTime());
         responseData.put("username", user.getUsername());
         responseData.put("email", user.getEmail());
-        responseData.put("name", user.getName());
         responseData.put("role", user.getRole().name());
         responseData.put("admin", user.isAdmin());
 
