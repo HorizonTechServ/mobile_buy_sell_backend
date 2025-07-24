@@ -1,6 +1,6 @@
-# 🎓 Arpit Institute Backend API
+# 📱 Mobile Buy & Sell Backend API
 
-This is a RESTful API for **Arpit Institute**, designed to manage students, receipts, and administrative operations efficiently. The backend provides secure, role-based access and handles student registration, fee collection, receipt generation, and user management.
+This is a RESTful API for a **Mobile Buy & Sell** application. It allows users to add mobile buying and selling entries, view inventory, and generate bills for sold products. The backend is secure, scalable, and built using modern Java Spring technologies.
 
 ---
 
@@ -20,23 +20,22 @@ This is a RESTful API for **Arpit Institute**, designed to manage students, rece
 
 ## 🧩 Modules
 
-### 🧑‍🏫 User Management
+### 👤 User Management
 
-* Register Admin, and Students
+* Register users
 * Update user details and profile picture
 * Reset/change password using OTP
 * Role-based access controls
 
-### 💵 Receipt/Billing Module
+### 📱 Buy & Sell Module
 
-* Generate and store tuition receipts
-* Calculate fees and total dynamically
-* Convert amount to words
-* Attach cheque/payment details
-* Retrieve receipt by ID
-* List all receipts
+* Add buy entry for mobile devices
+* Add sell entry for available inventory
+* View all bought mobiles
+* View all sold mobiles
+* Generate detailed bill for each sale
 
-### 📦 Authentication
+### 🔐 Authentication
 
 * JWT-based login/logout
 * Token validation
@@ -48,19 +47,19 @@ This is a RESTful API for **Arpit Institute**, designed to manage students, rece
 
 | Role           | Capabilities                                          |
 | -------------- | ----------------------------------------------------- |
-| 🔵 Admin       | Register/edit students, manage receipts               |
-| 🔹 Student     | View profile, update password, upload profile image   |
+| 🔵 Admin       | Add/view buy & sell entries, generate bills           |
+| 🔹 User        | View own buy/sell records, update profile             |
 
 ---
 
 ## 🎯 Key Features
 
 * ✅ Secure JWT authentication & role-based authorization
-* ✅ Admins can register/update students
-* ✅ Students can view and update profile
-* ✅ Dynamic fee receipt generation
-* ✅ Fee breakup with amount-to-words converter
-* ✅ Soft delete support for users
+* ✅ Users can record buy and sell transactions
+* ✅ Admins can generate bills for sold items
+* ✅ Detailed inventory view (buy/sell listing)
+* ✅ Soft delete support for records
+* ✅ Audit timestamps for creation and updates
 
 ---
 
@@ -68,21 +67,8 @@ This is a RESTful API for **Arpit Institute**, designed to manage students, rece
 
 ```bash
 # Clone the repository
-git clone https://github.com/HorizonTechServ/arpit-institute-backend.git
-cd arpit-institute-backend
+git clone https://github.com/HorizonTechServ/mobile_buy_sell_backend.git
+cd mobile-buy-sell-backend
 
 # Run using Gradle
 ./gradlew bootRun
-```
-
-Ensure `MySQL` is running and the database is configured in `application.yml`.
-
----
-
-## 📄 Swagger API Docs
-
-Access all API documentation via Swagger UI:
-
-📌 (http://localhost:9191/institute/api/swagger-ui/index.html#/)
-
----
