@@ -1,6 +1,6 @@
-package com.one.arpitInstituteAPI.exception;
+package com.one.mobilebuysellAPI.exception;
 
-import com.one.arpitInstituteAPI.response.StandardResponse;
+import com.one.mobilebuysellAPI.response.StandardResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -48,12 +48,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StandardResponse<Void>> handleFileUploadException(Exception ex) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(StandardResponse.error("Uploaded file exceeds the maximum allowed size of 10MB"));
-    }
-
-    @ExceptionHandler(DuplicateFeePaymentException.class)
-    public ResponseEntity<StandardResponse<Object>> handleDuplicateFeePayment(DuplicateFeePaymentException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(StandardResponse.error(ex.getMessage()));
     }
 
     // Any runtime exception

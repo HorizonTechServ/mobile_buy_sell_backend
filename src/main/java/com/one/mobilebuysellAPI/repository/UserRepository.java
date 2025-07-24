@@ -1,11 +1,9 @@
-package com.one.arpitInstituteAPI.repository;
+package com.one.mobilebuysellAPI.repository;
 
-import com.one.arpitInstituteAPI.entity.User;
-import com.one.arpitInstituteAPI.utils.UserRole;
+import com.one.mobilebuysellAPI.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

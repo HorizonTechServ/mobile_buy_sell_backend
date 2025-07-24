@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.utils;
+package com.one.mobilebuysellAPI.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

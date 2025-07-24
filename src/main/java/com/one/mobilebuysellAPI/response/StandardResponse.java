@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.response;
+package com.one.mobilebuysellAPI.response;
 
 public class StandardResponse<T> {
     private boolean status;

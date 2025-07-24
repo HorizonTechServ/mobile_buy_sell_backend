@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI;
+package com.one.mobilebuysellAPI;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

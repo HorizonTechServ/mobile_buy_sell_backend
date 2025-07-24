@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.dto;
+package com.one.mobilebuysellAPI.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

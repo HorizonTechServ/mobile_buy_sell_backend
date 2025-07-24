@@ -1,13 +1,13 @@
-package com.one.arpitInstituteAPI.controller;
+package com.one.mobilebuysellAPI.controller;
 
-import com.one.arpitInstituteAPI.dto.*;
-import com.one.arpitInstituteAPI.entity.User;
-import com.one.arpitInstituteAPI.exception.UserException;
-import com.one.arpitInstituteAPI.logger.DefaultLogger;
-import com.one.arpitInstituteAPI.repository.UserRepository;
-import com.one.arpitInstituteAPI.response.StandardResponse;
-import com.one.arpitInstituteAPI.service.OtpService;
-import com.one.arpitInstituteAPI.service.UserService;
+import com.one.mobilebuysellAPI.dto.*;
+import com.one.mobilebuysellAPI.entity.User;
+import com.one.mobilebuysellAPI.exception.UserException;
+import com.one.mobilebuysellAPI.logger.DefaultLogger;
+import com.one.mobilebuysellAPI.repository.UserRepository;
+import com.one.mobilebuysellAPI.response.StandardResponse;
+import com.one.mobilebuysellAPI.service.OtpService;
+import com.one.mobilebuysellAPI.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -73,26 +73,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register-student")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
-    @Operation(summary = "Register an Student", description = "Creates a new student")
-    public ResponseEntity<StandardResponse<UserDTO>> registerStudent(@Valid @RequestBody RegisterRequest request) {
-        String method = "registerStudent";
-
-        LOGGER.infoLog(CLASSNAME, method, "Request to register Student: " + request);
-
-        try {
-            User user = registerUsers(request);
-            UserDTO savedUser = userService.registerStudent(user);
-            LOGGER.infoLog(CLASSNAME, method, "Student registered: " + savedUser);
-            return ResponseEntity.ok(StandardResponse.success("Student registered", savedUser));
-        } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to register Student: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
-        }
-    }
-
-
     @DeleteMapping("/delete/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
     @Operation(summary = "Delete a User", description = "Allows an Admin or Super Admin to delete a user by ID using soft delete")
@@ -126,22 +106,6 @@ public class UserController {
         }
     }
 
-    @PutMapping("/edit-student/{userId}")
-    @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
-    @Operation(summary = "Edit User Details", description = "Update user name, mobile number")
-    public ResponseEntity<StandardResponse<UserDTO>> editStudentDetails(
-            @PathVariable Long userId,
-            @RequestBody Map<String, Object> updates) {
-        String method = "editStudentDetails";
-        LOGGER.infoLog(CLASSNAME, method, "Updating userId  with: ", userId);
-        try {
-            UserDTO updatedStudent = userService.editStudent(userId, updates);
-            return ResponseEntity.ok(StandardResponse.success("User updated", updatedStudent));
-        } catch (UserException e) {
-            LOGGER.errorLog(CLASSNAME, method, "Failed to update Student: " + e.getMessage());
-            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
-        }
-    }
 
     @PutMapping("/edit-admin/{userId}")
     @PreAuthorize("hasRole('ADMIN')")

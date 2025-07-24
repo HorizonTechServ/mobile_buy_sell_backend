@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.logger;
+package com.one.mobilebuysellAPI.logger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

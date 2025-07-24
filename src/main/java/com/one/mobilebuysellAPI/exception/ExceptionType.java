@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.exception;
+package com.one.mobilebuysellAPI.exception;
 
 public interface ExceptionType {
 

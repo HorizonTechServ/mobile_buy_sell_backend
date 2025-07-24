@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.utils;
+package com.one.mobilebuysellAPI.utils;
 
 import org.apache.commons.codec.binary.Hex;
 import javax.crypto.Mac;

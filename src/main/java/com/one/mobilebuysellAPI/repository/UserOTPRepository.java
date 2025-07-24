@@ -1,6 +1,6 @@
-package com.one.arpitInstituteAPI.repository;
+package com.one.mobilebuysellAPI.repository;
 
-import com.one.arpitInstituteAPI.entity.UserOTP;
+import com.one.mobilebuysellAPI.entity.UserOTP;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

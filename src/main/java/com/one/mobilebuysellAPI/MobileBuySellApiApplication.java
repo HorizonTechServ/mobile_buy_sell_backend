@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI;
+package com.one.mobilebuysellAPI;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.one.arpitInstituteAPI.logger.DefaultLogger;
-import com.one.arpitInstituteAPI.logger.LogManager;
+import com.one.mobilebuysellAPI.logger.DefaultLogger;
+import com.one.mobilebuysellAPI.logger.LogManager;
 
 @SpringBootApplication(scanBasePackages = "com.one")
 @EnableJpaRepositories("com.one")

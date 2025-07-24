@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.dto;
+package com.one.mobilebuysellAPI.dto;
 
 public class RefreshTokenRequest {
 

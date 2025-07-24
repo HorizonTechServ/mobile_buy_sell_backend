@@ -1,12 +1,12 @@
-package com.one.arpitInstituteAPI.service.impl;
+package com.one.mobilebuysellAPI.service.impl;
 
-import com.one.arpitInstituteAPI.dto.UserDTO;
-import com.one.arpitInstituteAPI.entity.User;
-import com.one.arpitInstituteAPI.exception.UserException;
-import com.one.arpitInstituteAPI.repository.UserRepository;
-import com.one.arpitInstituteAPI.service.UserService;
-import com.one.arpitInstituteAPI.utils.UserRole;
-import com.one.arpitInstituteAPI.utils.UserStatus;
+import com.one.mobilebuysellAPI.dto.UserDTO;
+import com.one.mobilebuysellAPI.entity.User;
+import com.one.mobilebuysellAPI.exception.UserException;
+import com.one.mobilebuysellAPI.repository.UserRepository;
+import com.one.mobilebuysellAPI.service.UserService;
+import com.one.mobilebuysellAPI.utils.UserRole;
+import com.one.mobilebuysellAPI.utils.UserStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,18 +47,6 @@ public class UserServiceImpl implements UserService {
         return toDTO(userRepository.save(user));
     }
 
-    @Override
-    @Transactional
-    public UserDTO registerStudent(User user) {
-
-        validateUser(user);
-
-        user.setAdmin(false); // Ensure all users are not admins by default
-
-        user.setRole(UserRole.STUDENT);
-
-        return toDTO(userRepository.save(user));
-    }
 
 
     @Override
@@ -136,40 +124,6 @@ public class UserServiceImpl implements UserService {
             String encodedPassword = passwordEncoder.encode(rawPassword);
             user.setPassword(encodedPassword);
         }
-        return toDTO(userRepository.save(user));
-    }
-
-
-    @Override
-    @Transactional
-    public UserDTO editStudent(Long userId, Map<String, Object> updates) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException("Student not found with user id: " + userId));
-
-        if (updates.containsKey("username")) {
-            String newUsername = (String) updates.get("username");
-            if (!newUsername.equals(user.getUsername()) &&
-                    userRepository.findUserByUsername(newUsername).isPresent()) {
-                throw new UserException(newUsername + "Username already in use");
-            }
-            user.setUsername(newUsername);
-        }
-
-        if (updates.containsKey("email")) {
-            String newEmail = (String   ) updates.get("email");
-            if (!newEmail.equalsIgnoreCase(user.getEmail()) &&
-                    userRepository.findByEmail(newEmail).isPresent()) {
-                throw new UserException(newEmail + " email is already in use");
-            }
-            user.setEmail(newEmail);
-        }
-
-        // Add gender field update
-        if (updates.containsKey("gender")) {
-            user.setGender((String) updates.get("gender"));
-        }
-
         return toDTO(userRepository.save(user));
     }
 

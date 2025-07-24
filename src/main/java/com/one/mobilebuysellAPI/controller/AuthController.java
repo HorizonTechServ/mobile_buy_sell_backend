@@ -1,14 +1,14 @@
-package com.one.arpitInstituteAPI.controller;
+package com.one.mobilebuysellAPI.controller;
 
-import com.one.arpitInstituteAPI.dto.LoginRequest;
-import com.one.arpitInstituteAPI.dto.RefreshTokenRequest;
-import com.one.arpitInstituteAPI.entity.User;
-import com.one.arpitInstituteAPI.logger.DefaultLogger;
-import com.one.arpitInstituteAPI.repository.UserRepository;
-import com.one.arpitInstituteAPI.response.StandardResponse;
-import com.one.arpitInstituteAPI.service.UserService;
-import com.one.arpitInstituteAPI.utils.JwtUtil;
-import com.one.arpitInstituteAPI.utils.UserStatus;
+import com.one.mobilebuysellAPI.dto.LoginRequest;
+import com.one.mobilebuysellAPI.dto.RefreshTokenRequest;
+import com.one.mobilebuysellAPI.entity.User;
+import com.one.mobilebuysellAPI.logger.DefaultLogger;
+import com.one.mobilebuysellAPI.repository.UserRepository;
+import com.one.mobilebuysellAPI.response.StandardResponse;
+import com.one.mobilebuysellAPI.service.UserService;
+import com.one.mobilebuysellAPI.utils.JwtUtil;
+import com.one.mobilebuysellAPI.utils.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

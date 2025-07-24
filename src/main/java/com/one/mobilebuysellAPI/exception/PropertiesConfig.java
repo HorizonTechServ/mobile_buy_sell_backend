@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.exception;
+package com.one.mobilebuysellAPI.exception;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;

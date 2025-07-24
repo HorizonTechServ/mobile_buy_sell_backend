@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.utils;
+package com.one.mobilebuysellAPI.utils;
 
 public class DigitalAPIResponseCode{
 	public static final long UNKNOWN_ERROR_CODE = -1l;

@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.logger.vo;
+package com.one.mobilebuysellAPI.logger.vo;
 
 public class AuditVO {
 

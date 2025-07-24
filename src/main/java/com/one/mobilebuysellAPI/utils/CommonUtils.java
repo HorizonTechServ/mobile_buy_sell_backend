@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.utils;
+package com.one.mobilebuysellAPI.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

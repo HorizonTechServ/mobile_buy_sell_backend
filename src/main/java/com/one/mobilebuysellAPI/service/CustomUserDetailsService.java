@@ -1,8 +1,8 @@
-package com.one.arpitInstituteAPI.service;
+package com.one.mobilebuysellAPI.service;
 
-import com.one.arpitInstituteAPI.entity.CustomUserDetails;
-import com.one.arpitInstituteAPI.entity.User;
-import com.one.arpitInstituteAPI.repository.UserRepository;
+import com.one.mobilebuysellAPI.entity.CustomUserDetails;
+import com.one.mobilebuysellAPI.entity.User;
+import com.one.mobilebuysellAPI.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

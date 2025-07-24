@@ -1,7 +1,7 @@
-package com.one.arpitInstituteAPI.dto;
+package com.one.mobilebuysellAPI.dto;
 
-import com.one.arpitInstituteAPI.utils.UserRole;
-import com.one.arpitInstituteAPI.utils.UserStatus;
+import com.one.mobilebuysellAPI.utils.UserRole;
+import com.one.mobilebuysellAPI.utils.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

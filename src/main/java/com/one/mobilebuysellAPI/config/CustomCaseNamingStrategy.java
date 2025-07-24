@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.config;
+package com.one.mobilebuysellAPI.config;
 
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.boot.model.naming.Identifier;

@@ -1,8 +1,8 @@
-package com.one.arpitInstituteAPI.logger;
+package com.one.mobilebuysellAPI.logger;
 
 import java.io.Serializable;
 
-import com.one.arpitInstituteAPI.logger.vo.AuditVO;
+import com.one.mobilebuysellAPI.logger.vo.AuditVO;
 
 
 public class AuditLogger implements IAuditLogger, Serializable{

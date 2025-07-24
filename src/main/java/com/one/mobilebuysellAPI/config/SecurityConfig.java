@@ -1,6 +1,6 @@
-package com.one.arpitInstituteAPI.config;
+package com.one.mobilebuysellAPI.config;
 
-import com.one.arpitInstituteAPI.utils.JwtAuthenticationFilter;
+import com.one.mobilebuysellAPI.utils.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

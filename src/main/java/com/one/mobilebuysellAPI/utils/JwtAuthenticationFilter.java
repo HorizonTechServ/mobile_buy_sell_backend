@@ -1,8 +1,8 @@
-package com.one.arpitInstituteAPI.utils;
+package com.one.mobilebuysellAPI.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.one.arpitInstituteAPI.entity.CustomUserDetails;
-import com.one.arpitInstituteAPI.response.StandardResponse;
+import com.one.mobilebuysellAPI.entity.CustomUserDetails;
+import com.one.mobilebuysellAPI.response.StandardResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -45,15 +45,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Skip JWT authentication for permitted endpoints
         if (requestURI.startsWith("/auth") ||
-                requestURI.startsWith("/institute/api/swagger-ui") ||
-                requestURI.startsWith("/institute/api/v3/api-docs") ||
-                requestURI.startsWith("/institute/api/swagger-ui/index.html") ||
-                requestURI.startsWith("/institute/api/auth/check-user/") ||
-                requestURI.startsWith("/institute/api/users/reset-password") ||
-                requestURI.equals("/institute/api/error") ||
-                requestURI.equals("/institute/api/auth/login") ||
+                requestURI.startsWith("/mobile/api/swagger-ui") ||
+                requestURI.startsWith("/mobile/api/v3/api-docs") ||
+                requestURI.startsWith("/mobile/api/swagger-ui/index.html") ||
+                requestURI.startsWith("/mobile/api/auth/check-user/") ||
+                requestURI.startsWith("/mobile/api/users/reset-password") ||
+                requestURI.equals("/mobile/api/error") ||
+                requestURI.equals("/mobile/api/auth/login") ||
 
-                requestURI.equals("/institute/api/users/register-admin")) {
+                requestURI.equals("/mobile/api/users/register-admin")) {
             filterChain.doFilter(request, response);
             return;
         }

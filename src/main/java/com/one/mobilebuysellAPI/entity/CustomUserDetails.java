@@ -1,6 +1,6 @@
-package com.one.arpitInstituteAPI.entity;
+package com.one.mobilebuysellAPI.entity;
 
-import com.one.arpitInstituteAPI.utils.UserStatus;
+import com.one.mobilebuysellAPI.utils.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,6 @@
-package com.one.arpitInstituteAPI.logger;
+package com.one.mobilebuysellAPI.logger;
 
-import com.one.arpitInstituteAPI.logger.vo.AuditVO;
+import com.one.mobilebuysellAPI.logger.vo.AuditVO;
 
 public interface IAuditLogger {
 	

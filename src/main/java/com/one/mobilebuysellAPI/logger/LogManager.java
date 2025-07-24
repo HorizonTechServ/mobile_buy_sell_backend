@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.logger;
+package com.one.mobilebuysellAPI.logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

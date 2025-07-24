@@ -1,4 +1,4 @@
-package com.one.arpitInstituteAPI.entity;
+package com.one.mobilebuysellAPI.entity;
 
 import jakarta.persistence.*;
 

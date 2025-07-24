@@ -1,11 +1,10 @@
-package com.one.arpitInstituteAPI.entity;
+package com.one.mobilebuysellAPI.entity;
 
-import com.one.arpitInstituteAPI.utils.UserRole;
-import com.one.arpitInstituteAPI.utils.UserStatus;
+import com.one.mobilebuysellAPI.utils.UserRole;
+import com.one.mobilebuysellAPI.utils.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,6 +1,6 @@
-package com.one.arpitInstituteAPI.service;
-import com.one.arpitInstituteAPI.entity.UserOTP;
-import com.one.arpitInstituteAPI.repository.UserOTPRepository;
+package com.one.mobilebuysellAPI.service;
+import com.one.mobilebuysellAPI.entity.UserOTP;
+import com.one.mobilebuysellAPI.repository.UserOTPRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class OtpService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        helper.setFrom("orangemotions.com", "Orange Motions");
+        helper.setFrom("horizontechserv.in", "Horizon Tech");
         helper.setTo(toEmail);
         helper.setSubject("Your password reset request");
 
@@ -49,7 +49,7 @@ public class OtpService {
         <p>Your OTP for password reset is: <strong>%s</strong></p>
         <p>This OTP is valid for 10 minutes.</p>
         <br>
-        <p>Regards,<br>Orange Motion Team</p>
+        <p>Regards,<br>Horizon Team</p>
         """, otp);
 
         helper.setText(emailBody, true); // Set `true` for HTML content
