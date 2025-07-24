@@ -15,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import java.util.Optional;
 
 @RestController
@@ -64,12 +67,19 @@ public class ReceiptController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all receipts", description = "Fetch all receipts")
-    public ResponseEntity<StandardResponse<List<Receipt>>> getAllReceipts() {
+    @Operation(summary = "Get all receipts", description = "Fetch all receipts with pagination and newest first")
+    public ResponseEntity<StandardResponse<Page<Receipt>>> getAllReceipts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         String method = "getAllReceipts";
-        LOGGER.infoLog(CLASSNAME, method, "Fetching all receipts");
-        List<Receipt> receipts = receiptRepository.findAll();
-        LOGGER.infoLog(CLASSNAME, method, "Fetched " + receipts.size() + " receipts");
-        return ResponseEntity.ok(StandardResponse.success("All receipts fetched", receipts));
+        LOGGER.infoLog(CLASSNAME, method, "Fetching receipts - Page: " + page + ", Size: " + size);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")); // newest first
+        Page<Receipt> receipts = receiptRepository.findAll(pageable);
+
+        LOGGER.infoLog(CLASSNAME, method, "Fetched " + receipts.getTotalElements() + " receipts (page " + page + ")");
+        return ResponseEntity.ok(StandardResponse.success("Receipts fetched", receipts));
     }
+
 }

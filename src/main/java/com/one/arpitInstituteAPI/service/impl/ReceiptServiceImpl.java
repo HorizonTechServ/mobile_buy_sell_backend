@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,26 +42,13 @@ public class ReceiptServiceImpl implements ReceiptService {
                 request.getDepartment()
         );
 
-
         if (existingReceipt.isPresent()) {
             throw new DuplicateFeePaymentException(
                     request.getStudentName() + " has already paid the fees for Semester " + request.getSemester()
             );
         }
 
-
-        // ✅ Save student if not already present
-        studentRepository.findByStudentName(request.getStudentName())
-                .orElseGet(() -> {
-                    Student student = new Student();
-                    student.setStudentName(request.getStudentName());
-                    student.setStudentMobileNumber(request.getStudentMobileNumber());
-                    student.setStudentEmail(request.getStudentEmail());
-                    return studentRepository.save(student);
-                });
-
-
-        // Proceed to save new receipt
+        // Prepare receipt entity
         Receipt receipt = new Receipt();
         receipt.setReceiptNo(generateNextReceiptNo());
         receipt.setYear(request.getYear());
@@ -93,32 +79,47 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setCreatedBy(createdBy);
         receipt.setCreatedAt(LocalDateTime.now());
 
-        return receiptRepository.save(receipt);
+        // ✅ Save receipt first
+        Receipt savedReceipt = receiptRepository.save(receipt);
+
+        // ✅ Save student only if receipt saved successfully
+        studentRepository.findByStudentName(request.getStudentName())
+                .orElseGet(() -> {
+                    Student student = new Student();
+                    student.setStudentName(request.getStudentName());
+                    student.setStudentMobileNumber(request.getStudentMobileNumber());
+                    student.setStudentEmail(request.getStudentEmail());
+                    return studentRepository.save(student);
+                });
+
+        return savedReceipt;
     }
 
-
-
     private String generateNextReceiptNo() {
-        String prefix = "RECX"; // default fallback prefix
+        String defaultPrefix = "RECX";
+        String prefix = defaultPrefix;
 
-        // Fetch prefix from config (use latest or only one record)
-        List<ReceiptConfig> configs = receiptConfigRepository.findAll();
-        if (!configs.isEmpty() && configs.get(0).getReceiptPrefix() != null) {
-            prefix = configs.get(0).getReceiptPrefix();
-            }
+        // 1. Use latest ReceiptConfig if available
+        Optional<ReceiptConfig> optionalConfig = receiptConfigRepository.findTopByOrderByIdDesc();
+        if (optionalConfig.isPresent() && optionalConfig.get().getReceiptPrefix() != null) {
+            prefix = optionalConfig.get().getReceiptPrefix().trim();
+        }
 
-        String lastReceiptNo = receiptRepository.findLastReceiptNo(); // e.g. "INS-000123"
-        long nextNumber = 1; // default for first record
+        // 2. Get the last receipt with the same prefix
+        String lastReceiptNo = receiptRepository.findLastReceiptNoByPrefix(prefix + "-"); // e.g., "RECX-000123"
 
+        long nextNumber = 1;
         if (lastReceiptNo != null && lastReceiptNo.startsWith(prefix + "-")) {
             try {
                 String numberPart = lastReceiptNo.substring((prefix + "-").length());
                 nextNumber = Long.parseLong(numberPart) + 1;
             } catch (NumberFormatException e) {
-                nextNumber = receiptRepository.count() + 1;
+                // fallback to count + 1 (for same prefix)
+                nextNumber = receiptRepository.countByPrefix(prefix + "-") + 1;
             }
         }
 
         return String.format("%s-%06d", prefix, nextNumber);
     }
+
 }
