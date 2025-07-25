@@ -1,15 +1,15 @@
 package com.one.mobilebuysellAPI.service;
 
 import com.one.mobilebuysellAPI.dto.BuyingDto;
+import com.one.mobilebuysellAPI.dto.DashboardCountSummaryDto;
 import com.one.mobilebuysellAPI.dto.DashboardSellInfoDto;
 import com.one.mobilebuysellAPI.dto.SellingDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface DashboardService {
-    List<BuyingDto> getAllBoughtProducts();
+    List<BuyingDto> getAllBoughtProducts(Integer month, Integer year);
     BuyingDto getBoughtProductByImei(String imeiNumber);
-    List<SellingDto> getAllSoldProducts();
-    List<DashboardSellInfoDto> getSellInfoSummaryWithProfit();
+    List<SellingDto> getAllSoldProducts(Integer month, Integer year);
+    List<DashboardSellInfoDto> getSellInfoSummaryWithProfit(Integer month, Integer year);
+    DashboardCountSummaryDto getBuySellCountSummary(Integer month, Integer year);
 }
