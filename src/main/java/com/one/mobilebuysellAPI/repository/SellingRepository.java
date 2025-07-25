@@ -16,4 +16,7 @@ public interface SellingRepository extends JpaRepository<Selling, Long> {
             "CAST(s.sellPrice - b.purchaseCost AS double)) " +
             "FROM Selling s JOIN s.buying b")
     List<DashboardSellInfoDto> getSellingInfoWithProfit();
+
+    boolean existsByInvoiceNumber(String invoiceNumber);
+
 }

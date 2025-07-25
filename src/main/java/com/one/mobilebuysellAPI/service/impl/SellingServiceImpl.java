@@ -9,7 +9,10 @@ import com.one.mobilebuysellAPI.service.SellingService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,15 +30,23 @@ public class SellingServiceImpl implements SellingService {
     public SellingDto addSelling(SellingDto sellingDto) {
         Buying buying = buyingRepository.findByImeiNumber(sellingDto.getImeiNumber())
                 .orElseThrow(() -> new RuntimeException("IMEI not found in Buying records"));
+
         Selling selling = new Selling();
         BeanUtils.copyProperties(sellingDto, selling);
         selling.setBuying(buying);
+
+        // Auto-generate unique invoice number
+        String generatedInvoiceNumber = generateUniqueInvoiceNumber();
+        selling.setInvoiceNumber(generatedInvoiceNumber);
+
         selling = sellingRepository.save(selling);
+
         SellingDto result = new SellingDto();
         BeanUtils.copyProperties(selling, result);
         result.setImeiNumber(selling.getBuying().getImeiNumber());
         return result;
     }
+
 
     @Override
     public List<SellingDto> getAllSellings() {
@@ -48,4 +59,20 @@ public class SellingServiceImpl implements SellingService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+
+    private String generateUniqueInvoiceNumber() {
+        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String randomPart = String.format("%04d", new Random().nextInt(10000)); // 0000 to 9999
+        String invoice = "INV-" + datePart + "-" + randomPart;
+
+        // Check if invoice already exists — if so, regenerate (optional safety check)
+        while (sellingRepository.existsByInvoiceNumber(invoice)) {
+            randomPart = String.format("%04d", new Random().nextInt(10000));
+            invoice = "INV-" + datePart + "-" + randomPart;
+        }
+
+        return invoice;
+    }
+
 }
