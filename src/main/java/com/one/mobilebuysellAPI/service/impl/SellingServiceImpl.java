@@ -3,9 +3,11 @@ package com.one.mobilebuysellAPI.service.impl;
 import com.one.mobilebuysellAPI.dto.SellingDto;
 import com.one.mobilebuysellAPI.entity.Buying;
 import com.one.mobilebuysellAPI.entity.Selling;
+import com.one.mobilebuysellAPI.exception.SellingException;
 import com.one.mobilebuysellAPI.repository.BuyingRepository;
 import com.one.mobilebuysellAPI.repository.SellingRepository;
 import com.one.mobilebuysellAPI.service.SellingService;
+import com.one.mobilebuysellAPI.utils.MoneyToWordsConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +30,21 @@ public class SellingServiceImpl implements SellingService {
 
     @Override
     public SellingDto addSelling(SellingDto sellingDto) {
+
+        // Step 1: Find the buying record by IMEI
         Buying buying = buyingRepository.findByImeiNumber(sellingDto.getImeiNumber())
-                .orElseThrow(() -> new RuntimeException("IMEI not found in Buying records"));
+                .orElseThrow(() -> new SellingException("IMEI not found in Buying records"));
+
+
+        // Step 2: Prevent reselling already sold phones
+        if ("SOLD".equalsIgnoreCase(buying.getSoldStatus())) {
+            throw new SellingException("This mobile is already sold.");
+        }
+
+
+        // Set sold status to "SOLD"
+        buying.setSoldStatus("SOLD");
+        buyingRepository.save(buying);
 
         Selling selling = new Selling();
         BeanUtils.copyProperties(sellingDto, selling);
@@ -38,6 +53,7 @@ public class SellingServiceImpl implements SellingService {
         // Auto-generate unique invoice number
         String generatedInvoiceNumber = generateUniqueInvoiceNumber();
         selling.setInvoiceNumber(generatedInvoiceNumber);
+        selling.setSellPriceInWord(MoneyToWordsConverter.convert(sellingDto.getSellPrice()));
 
         selling = sellingRepository.save(selling);
 

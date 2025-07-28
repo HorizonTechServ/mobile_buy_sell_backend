@@ -1,11 +1,13 @@
 package com.one.mobilebuysellAPI.controller;
 
 import com.one.mobilebuysellAPI.dto.SellingDto;
+import com.one.mobilebuysellAPI.exception.SellingException;
 import com.one.mobilebuysellAPI.logger.DefaultLogger;
 import com.one.mobilebuysellAPI.response.StandardResponse;
 import com.one.mobilebuysellAPI.service.SellingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +41,7 @@ public class SellingController {
 
     @PostMapping
     @Operation(summary = "Add New Sell Entry", description = "Add a new mobile sell entry with customer and pricing details")
-    public ResponseEntity<StandardResponse<SellingDto>> addSelling(@RequestBody SellingDto sellingDto) {
+    public ResponseEntity<StandardResponse<SellingDto>> addSelling(@Valid @RequestBody SellingDto sellingDto) {
         String method = "addSelling";
         LOGGER.infoLog(CLASSNAME, method, "Received new selling entry for invoice: " + sellingDto.getInvoiceNumber());
 
@@ -47,9 +49,9 @@ public class SellingController {
             SellingDto saved = sellingService.addSelling(sellingDto);
             LOGGER.debugLog(CLASSNAME, method, "Selling entry added successfully");
             return ResponseEntity.ok(StandardResponse.success("Selling entry added", saved));
-        } catch (Exception e) {
+        } catch (SellingException e) {
             LOGGER.errorLog(CLASSNAME, method, "Error saving selling entry: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(StandardResponse.error("Failed to add selling entry"));
+            return ResponseEntity.badRequest().body(StandardResponse.error(e.getMessage()));
         }
     }
 }

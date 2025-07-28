@@ -1,72 +1,48 @@
 package com.one.mobilebuysellAPI.dto;
 
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
 public class SellingDto {
+
     private Long id;
+
+    @NotNull(message = "Sell date is required")
     private LocalDate sellDate;
+
+    @NotNull(message = "Sell price is required")
+    @Positive(message = "Sell price must be positive")
     private Double sellPrice;
+
+    @NotBlank(message = "Customer name is required")
+    @Size(min = 2, max = 100, message = "Customer name must be between 2 and 100 characters")
     private String customerName;
+
+    @NotBlank(message = "Customer contact number is required")
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid mobile number")
     private String customerContactNumber;
+
     private String invoiceNumber;
-    private String imeiNumber; // For linking to Buying
 
-    // Getters and Setters
+    @NotBlank(message = "IMEI number is required")
+    private String imeiNumber;
 
-    public Long getId() {
-        return id;
-    }
+    @NotBlank(message = "Color is required")
+    private String color;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @NotBlank(message = "Model number is required")
+    private String modelNumber;
 
-    public LocalDate getSellDate() {
-        return sellDate;
-    }
+    @NotBlank(message = "Storage is required")
+    private String storage;
 
-    public void setSellDate(LocalDate sellDate) {
-        this.sellDate = sellDate;
-    }
+    @NotBlank(message = "Payment type is required")
+    private String paymentType;
 
-    public Double getSellPrice() {
-        return sellPrice;
-    }
-
-    public void setSellPrice(Double sellPrice) {
-        this.sellPrice = sellPrice;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public String getCustomerContactNumber() {
-        return customerContactNumber;
-    }
-
-    public void setCustomerContactNumber(String customerContactNumber) {
-        this.customerContactNumber = customerContactNumber;
-    }
-
-    public String getInvoiceNumber() {
-        return invoiceNumber;
-    }
-
-    public void setInvoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
-    }
-
-    public String getImeiNumber() {
-        return imeiNumber;
-    }
-
-    public void setImeiNumber(String imeiNumber) {
-        this.imeiNumber = imeiNumber;
-    }
+    private String sellPriceInWord;
 }

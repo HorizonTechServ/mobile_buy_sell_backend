@@ -17,4 +17,7 @@ public interface BuyingRepository extends JpaRepository<Buying, Long> {
 
     @Query("SELECT COUNT(b) FROM Buying b WHERE FUNCTION('MONTH', b.purchaseDate) = :month AND FUNCTION('YEAR', b.purchaseDate) = :year")
     long countByMonthAndYear(@Param("month") int month, @Param("year") int year);
+
+    List<Buying> findBySoldStatusIsNullOrSoldStatusNotIgnoreCase(String soldStatus);
+
 }

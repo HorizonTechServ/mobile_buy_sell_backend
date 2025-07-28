@@ -2,6 +2,7 @@ package com.one.mobilebuysellAPI.service.impl;
 
 import com.one.mobilebuysellAPI.dto.BuyingDto;
 import com.one.mobilebuysellAPI.entity.Buying;
+import com.one.mobilebuysellAPI.exception.BuyingException;
 import com.one.mobilebuysellAPI.repository.BuyingRepository;
 import com.one.mobilebuysellAPI.service.BuyingService;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +22,11 @@ public class BuyingServiceImpl implements BuyingService {
 
     @Override
     public BuyingDto addBuying(BuyingDto buyingDto) {
+
+        if (buyingRepository.findByImeiNumber(buyingDto.getImeiNumber()).isPresent()) {
+            throw new BuyingException("IMEI number already exists.");
+        }
+
         Buying buying = new Buying();
         BeanUtils.copyProperties(buyingDto, buying);
         buying = buyingRepository.save(buying);
@@ -45,5 +51,15 @@ public class BuyingServiceImpl implements BuyingService {
         BuyingDto dto = new BuyingDto();
         BeanUtils.copyProperties(buying, dto);
         return dto;
+    }
+
+    @Override
+    public List<BuyingDto> getUnsoldPhones() {
+        List<Buying> unsoldPhones = buyingRepository.findBySoldStatusIsNullOrSoldStatusNotIgnoreCase("SOLD");
+        return unsoldPhones.stream().map(buying -> {
+            BuyingDto dto = new BuyingDto();
+            BeanUtils.copyProperties(buying, dto);
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

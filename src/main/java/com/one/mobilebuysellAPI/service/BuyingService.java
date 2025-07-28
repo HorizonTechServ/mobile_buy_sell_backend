@@ -8,4 +8,5 @@ public interface BuyingService {
     BuyingDto addBuying(BuyingDto buyingDto);
     List<BuyingDto> getAllBuyings();
     BuyingDto getByImeiNumber(String imeiNumber);
+    List<BuyingDto> getUnsoldPhones();
 }

@@ -1,98 +1,45 @@
 package com.one.mobilebuysellAPI.dto;
 
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+@Setter
+@Getter
 public class BuyingDto {
+
     private Long id;
+
+    @NotNull(message = "Purchase date is required")
     private LocalDate purchaseDate;
+
+    @NotBlank(message = "IMEI number is required")
+    @Size(min = 10, max = 20, message = "IMEI number must be between 10 and 20 characters")
     private String imeiNumber;
+
+    @NotBlank(message = "Model number is required")
     private String modelNumber;
+
+    @NotBlank(message = "Storage is required")
     private String storage;
+
+    @NotBlank(message = "Color is required")
     private String color;
+
+    @NotBlank(message = "Purchase from is required")
     private String purchaseFrom;
+
+    @NotBlank(message = "Mobile number is required")
+    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
     private String mobileNumber;
+
+    @NotNull(message = "Purchase cost is required")
+    @Positive(message = "Purchase cost must be a positive number")
     private Double purchaseCost;
+
     private String repairingDetails;
 
-    // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDate getPurchaseDate() {
-        return purchaseDate;
-    }
-
-    public void setPurchaseDate(LocalDate purchaseDate) {
-        this.purchaseDate = purchaseDate;
-    }
-
-    public String getImeiNumber() {
-        return imeiNumber;
-    }
-
-    public void setImeiNumber(String imeiNumber) {
-        this.imeiNumber = imeiNumber;
-    }
-
-    public String getModelNumber() {
-        return modelNumber;
-    }
-
-    public void setModelNumber(String modelNumber) {
-        this.modelNumber = modelNumber;
-    }
-
-    public String getStorage() {
-        return storage;
-    }
-
-    public void setStorage(String storage) {
-        this.storage = storage;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getPurchaseFrom() {
-        return purchaseFrom;
-    }
-
-    public void setPurchaseFrom(String purchaseFrom) {
-        this.purchaseFrom = purchaseFrom;
-    }
-
-    public String getMobileNumber() {
-        return mobileNumber;
-    }
-
-    public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
-    }
-
-    public Double getPurchaseCost() {
-        return purchaseCost;
-    }
-
-    public void setPurchaseCost(Double purchaseCost) {
-        this.purchaseCost = purchaseCost;
-    }
-
-    public String getRepairingDetails() {
-        return repairingDetails;
-    }
-
-    public void setRepairingDetails(String repairingDetails) {
-        this.repairingDetails = repairingDetails;
-    }
+    private String soldStatus;
 }

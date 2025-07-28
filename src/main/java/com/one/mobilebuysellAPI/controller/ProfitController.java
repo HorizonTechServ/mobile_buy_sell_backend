@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,13 +24,16 @@ public class ProfitController {
     }
 
     @GetMapping("/profit")
-    @Operation(summary = "Get Total Profit", description = "Calculates and returns the total profit from all sold products")
-    public ResponseEntity<StandardResponse<Double>> getTotalProfit() {
+    @Operation(summary = "Get Total Profit", description = "Calculates and returns the total profit for a given month and year")
+    public ResponseEntity<StandardResponse<Double>> getTotalProfit(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year) {
+
         String method = "getTotalProfit";
-        LOGGER.infoLog(CLASSNAME, method, "Calculating total profit");
+        LOGGER.infoLog(CLASSNAME, method, "Calculating total profit for month: " + month + ", year: " + year);
 
         try {
-            double profit = profitService.getTotalProfit();
+            double profit = profitService.getTotalProfit(month, year);
             LOGGER.debugLog(CLASSNAME, method, "Total profit calculated: " + profit);
             return ResponseEntity.ok(StandardResponse.success("Total profit calculated", profit));
         } catch (Exception e) {
@@ -37,4 +41,5 @@ public class ProfitController {
             return ResponseEntity.internalServerError().body(StandardResponse.error("Failed to calculate profit"));
         }
     }
+
 }

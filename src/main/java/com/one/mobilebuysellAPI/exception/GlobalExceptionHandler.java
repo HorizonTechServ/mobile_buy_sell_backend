@@ -80,4 +80,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(StandardResponse.error("Data integrity violation: " + ex.getMessage()));
     }
+
+    @ExceptionHandler(CustomBadRequestException.class)
+    public ResponseEntity<Object> handleCustomBadRequest(CustomBadRequestException ex) {
+        return new ResponseEntity<>(new StandardResponse<>(false, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+    }
+
 }
