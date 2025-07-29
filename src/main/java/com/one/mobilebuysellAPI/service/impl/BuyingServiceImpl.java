@@ -28,6 +28,10 @@ public class BuyingServiceImpl implements BuyingService {
         }
 
         Buying buying = new Buying();
+
+        // Set default soldStatus before saving
+        buyingDto.setSoldStatus("UNSOLD");
+
         BeanUtils.copyProperties(buyingDto, buying);
         buying = buyingRepository.save(buying);
         BuyingDto result = new BuyingDto();

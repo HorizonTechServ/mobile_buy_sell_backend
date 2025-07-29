@@ -50,6 +50,5 @@ public class Buying {
 
     private String repairingDetails;
 
-    @Column(nullable = false)
     private String soldStatus = "UNSOLD";
 }
