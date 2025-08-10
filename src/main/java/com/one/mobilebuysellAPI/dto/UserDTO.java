@@ -2,15 +2,15 @@ package com.one.mobilebuysellAPI.dto;
 
 import com.one.mobilebuysellAPI.utils.UserRole;
 import com.one.mobilebuysellAPI.utils.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class UserDTO {
     private Long id;
     private String email;
